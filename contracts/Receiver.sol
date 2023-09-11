@@ -1,47 +1,54 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
-pragma solidity 0.8.9;
+pragma solidity ^0.8.10;
 pragma experimental ABIEncoderV2;
 
 import "./MerkleTree.sol";
+import "./MerkleTreeSubset.sol";
+import "./Blacklist.sol";
 import "./WETH.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./verifiers/withdraw_from_subset_verifier.sol";
 import { AxelarExecutable } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
 import { IAxelarGateway } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
 import { IAxelarGasService } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol';
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract Receiver is AxelarExecutable, MerkleTree, ReentrancyGuard, WithdrawFromSubsetVerifier {
+contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, ReentrancyGuard, WithdrawFromSubsetVerifier {
+    using ProofLib for bytes;
+    using SafeERC20 for IERC20;
+
     uint256 public immutable denomination;
     WETHToken public weth;
     IAxelarGasService gasService;
 
-    mapping(bytes32 => bool) public nullifierHashes;
+    mapping(uint => bool) public nullifierHashes;
 
     event Withdrawal(
         address to,
-        bytes32 nullifierHash,
+        uint nullifierHash,
         address indexed relayer,
         uint256 fee
     );
 
     event Deposit(
-        bytes32 indexed commitment,
-        uint32 leafIndex,
+        uint indexed commitment,
+        uint leafIndex,
         uint256 timestamp
     );
-   
 
-    /**
-    @param _denomination transfer amount for each deposit
-    @param _merkleTreeHeight the height of deposits' Merkle Tree
-    */
+    error FeeExceedsDenomination();
+    error InvalidZKProof();
+    error NoteAlreadySpent();
+    error UnknownRoot();
+   
     constructor(
         address gateway_,
         address gasReceiver_,
         uint256 _denomination,
-        address _hasher
-    ) MerkleTreeWithHistory(_hasher) AxelarExecutable(gateway_)  {
+        address poseidon
+    ) MerkleTree(poseidon, bytes("empty").snarkHash()) 
+    MerkleTreeSubset(poseidon, bytes("allowed").snarkHash()) Blacklist() AxelarExecutable(gateway_)  {
         gasService = IAxelarGasService(gasReceiver_);
         require(_denomination > 0, "denomination should be greater than 0");
         denomination = _denomination;
@@ -56,9 +63,8 @@ contract Receiver is AxelarExecutable, MerkleTree, ReentrancyGuard, WithdrawFrom
         string calldata sourceAddress_,
         bytes calldata payload_
     ) internal override {
-        bytes32 commitment = abi.decode(payload_, (bytes32));
-        uint32 insertedIndex = insert(commitment);
-       // _processDeposit();
+        uint commitment = abi.decode(payload_, (uint));
+        uint insertedIndex = insert(commitment);
 
         emit Deposit(commitment, insertedIndex, block.timestamp);
     }
@@ -79,11 +85,11 @@ contract Receiver is AxelarExecutable, MerkleTree, ReentrancyGuard, WithdrawFrom
         address recipient,
         address relayer,
         uint fee
-    ) external payable nonReentrant returns(bool) {
+    ) external payable nonReentrant {
         if (nullifierHashes[nullifierHash]) revert NoteAlreadySpent();
         if (!isKnownRoot(root)) revert UnknownRoot();
         if (fee > denomination) revert FeeExceedsDenomination();
-        uint withdrawMetadata = abi.encode(recipient, relayer, fee).snarkHash();
+        uint withdrawMetadata = abi.encode(recipient, relayer, fee).snarkHash() ;
         if (!_verifyWithdrawFromSubsetProof(
             flatProof,
             root,
@@ -94,6 +100,7 @@ contract Receiver is AxelarExecutable, MerkleTree, ReentrancyGuard, WithdrawFrom
         nullifierHashes[nullifierHash] = true;
         
         _processWithdraw(recipient, relayer, fee);
+        emit Withdrawal(recipient, nullifierHash, relayer, fee);
     }
 
     function _processWithdraw(

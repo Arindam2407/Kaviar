@@ -15,6 +15,4 @@ nullifierHash = PoseidonHash(nullifier, 1, leafIndex)
 
 - Use [Privacy Pools](https://github.com/ameensol/privacy-pools) to block blacklisted actors from using the protocol.
 
-- [Merkle Root and Subset Merkle Root](./image.png)
-
 - Use [Axelar](https://github.com/axelarnetwork/axelar-core) to bridge assets between two chains.
