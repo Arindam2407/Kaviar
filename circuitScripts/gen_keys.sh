@@ -66,7 +66,7 @@ fi
 
 if [ ! -f "./contracts/verifiers/${TARGET}_verifier.sol" ]
 then
-    python3 ./scripts/export_verifier.py $TARGET $NUM_PUBLIC_INPUTS
+    python3 ./circuitScripts/export_verifier.py $TARGET $NUM_PUBLIC_INPUTS
     echo $TARGET verifier contract exported!
 else
     echo $TARGET verifier contract already exported!

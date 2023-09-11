@@ -36,5 +36,5 @@ snarkjs zkesv \
     ./circuits/out/${TARGET}_verifier.sol
 echo $TARGET verifier template contract exported!
 
-python3 ./scripts/export_verifier.py $TARGET $NUM_PUBLIC_INPUTS
+python3 ./circuitScripts/export_verifier.py $TARGET $NUM_PUBLIC_INPUTS
 echo $TARGET verifier contract exported!
