@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
+import "./MerkleTree.sol";
+import "./MerkleTreeSubset.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "./verifiers/withdraw_from_subset_verifier.sol";
-import "./MerkleTree.sol";
+import "./Blacklist.sol";
 
-contract PrivacyPool is ReentrancyGuard, MerkleTree, WithdrawFromSubsetVerifier {
+contract PrivacyPool is ReentrancyGuard, MerkleTree, MerkleTreeSubset, WithdrawFromSubsetVerifier, Blacklist {
     using ProofLib for bytes;
     using SafeERC20 for IERC20;
 
@@ -33,7 +35,8 @@ contract PrivacyPool is ReentrancyGuard, MerkleTree, WithdrawFromSubsetVerifier 
 
     mapping (uint => bool) public nullifierHashes;
 
-    constructor(address poseidon, uint256 _denomination) MerkleTree(poseidon, bytes("empty").snarkHash()) {
+    constructor(address poseidon, uint256 _denomination) MerkleTree(poseidon, bytes("empty").snarkHash()) 
+    MerkleTreeSubset(poseidon, bytes("allowed").snarkHash()) Blacklist() {
         require(_denomination > 0, "denomination should be greater than 0");
         denomination = _denomination;
     }
@@ -47,6 +50,14 @@ contract PrivacyPool is ReentrancyGuard, MerkleTree, WithdrawFromSubsetVerifier 
         _processDeposit();
 
         uint leafIndex = insert(commitment);
+
+        uint isBanned = bytes("allowed").snarkHash();
+
+        if(isBlacklisted(msg.sender)){
+            isBanned = bytes("blocked").snarkHash();
+        }
+
+        uint leafIndexSubset = insertSubset(isBanned);
 
         emit Deposit(commitment, leafIndex, block.timestamp);
         return leafIndex;

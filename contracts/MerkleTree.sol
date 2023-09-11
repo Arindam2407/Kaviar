@@ -9,9 +9,7 @@ contract MerkleTree {
 
     uint256 public constant FIELD_SIZE =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
-    uint256 public constant ZERO_VALUE =
-        543544072303548185257517071258879077999438229338741863745347926248040160894; // = keccak256("empty") % FIELD_SIZE
-
+        
     uint public constant ROOT_HISTORY_SIZE = 30;
 
     uint32 public immutable levels = 20;
@@ -25,15 +23,15 @@ contract MerkleTree {
     uint public currentRootIndex;
     uint public nextIndex;
 
-    constructor(address poseidon) {
+    constructor(address poseidon, uint zeroValue) {
         hasher = Poseidon(poseidon);
         for (uint i; i < levels;) {
-            zeros[i] = ZERO_VALUE;
-            filledSubtrees[i] = ZERO_VALUE;
-            ZERO_VALUE = hasher.poseidon([ZERO_VALUE, ZERO_VALUE]);
+            zeros[i] = zeroValue;
+            filledSubtrees[i] = zeroValue;
+            zeroValue = hasher.poseidon([zeroValue, zeroValue]);
             unchecked { ++i; }
         }
-        roots[0] = ZERO_VALUE;
+        roots[0] = zeroValue;
     }
 
     function getLastRoot() public view returns (uint) {
@@ -69,6 +67,16 @@ contract MerkleTree {
                 left = filledSubtrees[i];
                 right = currentHash;
             }
+
+            require(
+            left < FIELD_SIZE,
+            "left should be inside the field");
+
+            require(
+            right < FIELD_SIZE,
+            "right should be inside the field"
+            );
+
             currentHash = hasher.poseidon([left, right]);
             unchecked {
                 ++i;
