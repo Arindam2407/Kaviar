@@ -1,4 +1,35 @@
-export const poseidonAddr = "0xb47C3f4f98DDF82DC5e2Da560ae4Bd88e434E5A7";
-export const tornado = "0x5528157F43b7C563AF11a128F8c6D53BC5dFe765";
-export const sender = "0x5a505322204eE054F07E75B5067bf23533701732";
-export const receiver = "0x58b227b30F40D03534814F716350BA025c816a4E";
+export const poseidonAddr = "0x70E21B9FF22ED107fBE869fAe2Dfd5Ce05dE6fe5";
+export const privacyPool = "0x88Dc222180a2e5c6C8aEca044Bb186B6557Bd765";
+export const sender = "0xB741bc12b42E817B9FFc22b4AF4b2f8982071Bc1";
+export const receiver = "0x83B7e46230ab279952Ad210c414d554255Ea95a2";
+export const poseidonAddrLinea = "0x52EE8690474938F6fEeB75EAb252f805873c11E1";
+export const receiverLinea = "0x031A0edC3Ab6Da378f3a9C73d8059270Bd07c03d";
+
+export const goerliNet = {
+    url: "https://eth-goerli.g.alchemy.com/v2/wQZhZrGooqQlJMi44xtV3WQEAlhY8Ycz",
+    chainId: 5,
+    gateway:"0xe432150cce91c13a887f7D836923d5597adD8E31",
+    gasservice:"0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+    name: "ethereum-2"
+}
+export const bscNet = {
+    url: "https://bsc-testnet.publicnode.com",
+    chainId: 97,
+    gateway:"0x4D147dCb984e6affEEC47e44293DA442580A3Ec0",
+    gasservice:"0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+    name: "binance"
+}
+export const mantleNet = {
+    url:"https://rpc.testnet.mantle.xyz",
+    chainId: 5001,
+    gateway:"0xe432150cce91c13a887f7D836923d5597adD8E31",
+    gasservice:"0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+    name: "mantle"
+}
+export const lineaNet = {
+    url:"https://rpc.goerli.linea.build",
+    chainId: 59140,
+    gateway: "0xe432150cce91c13a887f7D836923d5597adD8E31",
+    gasservice: "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6",
+    name: "linea"
+}

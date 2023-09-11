@@ -16,12 +16,12 @@ async function main() {
     const ETH_AMOUNT = ethers.utils.parseEther("0.01");
     const HEIGHT = 20;
 
-    const tornado = await new PrivacyPool__factory(signer).deploy(
+    const privacyPool = await new PrivacyPool__factory(signer).deploy(
         poseidonAddr,
         ETH_AMOUNT
     );
-    await (tornado).deployed();
-    console.log(tornado.address);
+    await (privacyPool).deployed();
+    console.log(privacyPool.address);
 
 
 }
