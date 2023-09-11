@@ -15,11 +15,11 @@ else
     echo $TARGET circuit already compiled!
 fi
 
-if [ -f "./powers_of_tau/powersOfTau28_hez_final_$TAU.ptau" ]; then
+if [ -f "./helpers/powers_of_tau/powersOfTau28_hez_final_$TAU.ptau" ]; then
     echo powersOfTau28_hez_final_$TAU.ptau found!
 else
     wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_$TAU.ptau \
-        -O ./powers_of_tau/powersOfTau28_hez_final_$TAU.ptau
+        -O ./helpers/powers_of_tau/powersOfTau28_hez_final_$TAU.ptau
 fi
 
 if [ ! -f "./circuits/out/${TARGET}_0000.zkey" ]
@@ -27,7 +27,7 @@ then
     echo generating zkp proving and verifying keys!
     snarkjs g16s \
 		./circuits/out/$TARGET.r1cs \
-		./powers_of_tau/powersOfTau28_hez_final_$TAU.ptau \
+		./helpers/powers_of_tau/powersOfTau28_hez_final_$TAU.ptau \
 		./circuits/out/${TARGET}_0000.zkey -v
     echo $TARGET groth16 setup complete!
 else
