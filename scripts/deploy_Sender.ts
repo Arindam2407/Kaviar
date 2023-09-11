@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
-import{ Sender__factory} from  "../types";
+import { Sender__factory } from  "../types";
+import { poseidonAddr } from "../const";
 
 dotenv.config();
 async function main() {
@@ -22,17 +23,18 @@ async function main() {
     const ETH_AMOUNT = ethers.utils.parseEther("0.01");
     
     
-    const verifier = await new Sender__factory(signer).deploy(
+    const sender = await new Sender__factory(signer).deploy(
         gateway,
         gasservice,
-        ETH_AMOUNT
+        ETH_AMOUNT,
+        poseidonAddr
       );
-    await (verifier).deployed();
-    console.log(`Sender contract deployed to ${verifier.address}`);
+    await (sender).deployed();
+    console.log(`Sender contract deployed to ${sender.address}`);
 
 }
 
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
-  })
+})

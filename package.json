@@ -40,7 +40,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.19",
     "snarkjs": "^0.4.13",
     "ts-node": "^10.5.0",
-    "typechain": "^5.2.0",
+    "typechain": "^8.3.1",
     "typescript": "^4.5.5",
     "vmtree-sdk": "vmtree/sdk#d2b1b91c24ec8a4e70058f9f2b0db0b9651ae948"
   },

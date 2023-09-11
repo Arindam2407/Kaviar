@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
-import{ ETHTornado__factory} from  "../types";
-import {verifier, poseidonAddr} from "../const";
+import{ PrivacyPool__factory} from  "../types";
+import {poseidonAddr} from "../const";
 
 dotenv.config();
 async function main() {
@@ -16,11 +16,9 @@ async function main() {
     const ETH_AMOUNT = ethers.utils.parseEther("0.01");
     const HEIGHT = 20;
 
-    const tornado = await new ETHTornado__factory(signer).deploy(
-        verifier,
-        ETH_AMOUNT,
-        HEIGHT,
-        poseidonAddr
+    const tornado = await new PrivacyPool__factory(signer).deploy(
+        poseidonAddr,
+        ETH_AMOUNT
     );
     await (tornado).deployed();
     console.log(tornado.address);
