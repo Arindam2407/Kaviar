@@ -1,10 +1,8 @@
-export const poseidonAddr = "";
-export const blacklistAddr = "";
-export const senderAddr = "";
+export const poseidonAddr = "0x90543074042965ACAB09eFCE96CBF5CfFeA1a4f5";
+export const senderAddr = "0x9191Bab59eEB4b42A5ECad2Dd042e79Dec76E14E";
 
-export const poseidonBsc = "";
-export const blacklistBsc = "";
-export const receiverBsc = "";
+export const poseidonBsc = "0x90543074042965ACAB09eFCE96CBF5CfFeA1a4f5";
+export const receiverBsc = "0x9191Bab59eEB4b42A5ECad2Dd042e79Dec76E14E";
 
 export const goerliNet = {
     url: "https://eth-goerli.g.alchemy.com/v2/wQZhZrGooqQlJMi44xtV3WQEAlhY8Ycz",

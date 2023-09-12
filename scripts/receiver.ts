@@ -34,12 +34,14 @@ async function main(){
     console.log("pass 1");
     const tree = new MerkleTree(
         HEIGHT,
+        "21663839004416932945382355908790599225266501822907911457504978515578255421292",
         "test",
         new PoseidonHasher(poseidon)
     );
 
     const SubsetTree = new MerkleTree(
         HEIGHT,
+        "11954255677048767585730959529592939615262310191150853775895456173962480955685",
         "allowed",
         new PoseidonHasher(poseidon)
     );
@@ -51,7 +53,7 @@ async function main(){
      ])
 
     const leafIndex = 0
-    const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex])
+    const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]).toBigInt();
     const commitment = "0x131d05841a55fe138852b423e66d766620a71c1b259254bea564839fb99e3f27"
     let allowValue = "0x1a6dde72d78cdcb5cbb6678be64735040d7e8bffe5b7e08f7e2813239f71b125";
 
@@ -75,40 +77,54 @@ async function main(){
     const relayer = await relayerSigner.getAddress();
     const fee = 0;
 
-    const encodedData = ethers.utils.solidityPack(
+    const encodedData = ethers.utils.solidityKeccak256(
         ['address', 'address', 'uint256'],
         [recipient, relayer, fee]
     );
 
-    const snark_scalar_field = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
-
-    const withdrawMetadata = ethers.BigNumber.from(ethers.utils.keccak256(encodedData)).toNumber() % (snark_scalar_field);
+    const withdrawMetadata = BigNumber.from((encodedData)).toBigInt();
 
     const { root, path_elements, path_index } = await tree.path(
          leafIndex
     );
 
+    const rootI = root.toBigInt();
+
     const { root: subsetRoot, path_elements: path_elements_subset, path_index: path_index_subset } = await SubsetTree.path(
         leafIndex
     );
 
-    const nullifierBigNumber = BigNumber.from(nullifier).toBigInt();
+    const subsetRootI = subsetRoot.toBigInt();
 
+    const nullifierBigInt = BigNumber.from(nullifier).toBigInt();
+
+    const path_elementsI = path_elements.map(bN => bN.toBigInt());
+    const path_elements_subsetI = path_elements_subset.map(bN => bN.toBigInt());
+
+    console.log(`Root: ${typeof(rootI)}`);
+    console.log(`Subset Root: ${typeof(subsetRootI)}`);
+    console.log(`Nullifier Hash: ${typeof(nullifierHash)}`);
+    console.log(`WithdrawMetadata: ${typeof(withdrawMetadata)}`);
+    console.log(`Nullifier: ${typeof(nullifierBigInt)}`);
+    console.log(`Path_Index: ${typeof(path_index)}`);
+    console.log(`Path Elements: ${typeof(path_elementsI[0])}`);
+    console.log(`Path Elements Subset: ${typeof(path_elements_subsetI[0])}`);
+    
     // change this
     const witness = {
         // Public
-        root,
-        subsetRoot,
+        rootI,
+        subsetRootI,
         nullifierHash,
         withdrawMetadata,
         // Private (user keep)
-        nullifierBigNumber,
+        nullifierBigInt,
         path_index,
-        path_elements,
-        path_elements_subset
+        path_elementsI,
+        path_elements_subsetI
     };
 
-    const solProof = await prove(witness);
+    const solProof: BigNumberish[] = await prove(witness);
     console.log(solProof)
 
     const txWithdraw = await receiverContract
@@ -116,7 +132,6 @@ async function main(){
         .withdraw(solProof, root, subsetRoot, nullifierHash, recipient, relayer, fee);
     const receiptWithdraw = await txWithdraw.wait();
     console.log("Withdraw gas cost", receiptWithdraw.gasUsed.toNumber()); 
-
 }
 
 class PoseidonHasher implements Hasher {

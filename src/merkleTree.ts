@@ -48,6 +48,7 @@ export class MerkleTree {
 
     constructor(
         public n_levels: number,
+        public zV: string,
         public prefix: string,
         public hasher: Hasher,
         public storage = new JsStorage()
@@ -56,7 +57,7 @@ export class MerkleTree {
         this.totalElements = 0;
 
         let current_zero_value =
-            BigNumber.from("21663839004416932945382355908790599225266501822907911457504978515578255421292");
+            BigNumber.from(zV);
         this.zero_values.push(current_zero_value);
         for (let i = 0; i < n_levels; i++) {
             current_zero_value = this.hasher.hash(
@@ -127,7 +128,7 @@ export class MerkleTree {
         return {
             root,
             path_elements: traverser.path_elements,
-            path_index: traverser.path_index,
+            path_index: index,
             element,
         };
     }
