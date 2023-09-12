@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 import{ Receiver__factory } from  "../types";
-import {poseidonAddr} from "../const";
+import { poseidonBsc } from "../const";
 
 dotenv.config();
 async function main() {
@@ -13,7 +13,7 @@ async function main() {
     const balance = Number(ethers.utils.formatEther(balanceBN));
     console.log(`Wallet balance ${balance}`);
 
-    const gateway = "0xe432150cce91c13a887f7D836923d5597adD8E31";
+    const gateway = "0x4D147dCb984e6affEEC47e44293DA442580A3Ec0";
     const gasservice = "0xbE406F0189A0B4cf3A05C286473D23791Dd44Cc6";
     const ETH_AMOUNT = ethers.utils.parseEther("0.01");
     const HEIGHT = 20;
@@ -22,7 +22,7 @@ async function main() {
         gateway,
         gasservice,
         ETH_AMOUNT,
-        poseidonAddr
+        poseidonBsc
     );
   
     await (receiver).deployed();

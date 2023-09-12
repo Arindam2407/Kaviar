@@ -2,8 +2,8 @@ import { ethers } from "hardhat";
 import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
-import {Receiver__factory} from "../types";
-import { mantleNet, receiver } from "../const";
+import {Receiver__factory, Blacklist__factory} from "../types";
+import { bscNet, poseidonAddr, receiver } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -13,8 +13,8 @@ import path from "path";
 async function main(){
     const userOldSignerWallet = new ethers.Wallet(process.env.userOldSigner ?? "");
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        mantleNet.url,
-        mantleNet.chainId
+        bscNet.url,
+        bscNet.chainId
       );
     const userOldSigner = userOldSignerWallet.connect(provider);
     const relayerSignerWallet = new ethers.Wallet(process.env.relayerSigner ?? "");
@@ -133,6 +133,32 @@ async function prove(witness: any): Promise<BigNumberish[]> {
     proof.pi_b[1][1], proof.pi_b[1][0], proof.pi_c[0], proof.pi_c[1]] 
 
     return solProof;
+}
+
+class Deposit {
+    public constructor(
+        public readonly nullifier: Uint8Array,
+        public poseidon: any,
+        public leafIndex?: number
+    ) {
+        this.poseidon = poseidon;
+    }
+    static new(poseidon: any) {
+        // random nullifier (private note)
+        // here we only have private nullifier 
+        const nullifier = ethers.utils.randomBytes(15);
+        return new this(nullifier, poseidon);
+    }
+    // get hash of secret (nullifier)
+    get commitment() {
+        return poseidonHash(this.poseidon, [this.nullifier, 0]);
+    }
+    // get hash f nullifierhash (nulifier+1+index)
+    get nullifierHash() {
+        if (!this.leafIndex && this.leafIndex !== 0)
+            throw Error("leafIndex is unset yet");
+        return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
+    }
 }
 
 main().catch((error) => {

@@ -1,7 +1,6 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 import{ Blacklist__factory } from  "../types";
-import {poseidonAddr} from "../const";
 
 dotenv.config();
 async function main() {

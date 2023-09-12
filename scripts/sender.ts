@@ -3,7 +3,7 @@ import {ethers} from "hardhat";
 //@ts-ignore
 import {buildPoseidon } from "circomlibjs";
 import {Sender__factory} from "../types";
-import { sender, bscNet, lineaNet, receiverLinea} from "../const";
+import { senderAddr, receiver, bscNet, receiverBsc } from "../const";
 
 dotenv.config();
 async function main() {
@@ -22,13 +22,13 @@ async function main() {
     const deposit = Deposit.new(poseidon);
 
     
-    const senderContract = await new Sender__factory(signer).attach(ethers.utils.getAddress(sender));
+    const senderContract = await new Sender__factory(signer).attach(ethers.utils.getAddress(senderAddr));
     console.log("signer:", signer)
     const TOTAL_VALUE = ethers.utils.parseEther("0.002");
     console.log("pass 1");
     const tx = await senderContract
     .connect(signer)
-    .deposit(deposit.commitment, lineaNet.name, receiverLinea, { value: TOTAL_VALUE, gasLimit:1000000 });
+    .deposit(deposit.commitment, bscNet.name, receiverBsc, { value: TOTAL_VALUE, gasLimit:1000000 });
     const receipt = await tx.wait();
     const events = await senderContract.queryFilter(
         senderContract.filters.Deposit(),
