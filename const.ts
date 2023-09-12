@@ -1,8 +1,8 @@
-export const poseidonAddr = "0x86ECE5cfBeCeC21054fAC970141537aa57BE177d";
+export const poseidonAddr = "";
 export const blacklistAddr = "";
 export const senderAddr = "";
 
-export const poseidonBsc = "0x86ECE5cfBeCeC21054fAC970141537aa57BE177d";
+export const poseidonBsc = "";
 export const blacklistBsc = "";
 export const receiverBsc = "";
 

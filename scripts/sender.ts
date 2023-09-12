@@ -1,9 +1,9 @@
 import * as dotenv from "dotenv";
 import {ethers} from "hardhat";
 //@ts-ignore
-import {buildPoseidon } from "circomlibjs";
-import {Sender__factory} from "../types";
-import { senderAddr, receiver, bscNet, receiverBsc } from "../const";
+import { poseidonContract, buildPoseidon } from "circomlibjs";
+import { Sender__factory } from "../types";
+import { senderAddr, bscNet, receiverBsc } from "../const";
 
 dotenv.config();
 async function main() {
@@ -77,6 +77,13 @@ class Deposit {
         return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
     }
 }
+
+function getPoseidonFactory(nInputs: number) {
+    const bytecode = poseidonContract.createCode(nInputs);
+    const abiJson = poseidonContract.generateABI(nInputs);
+    const abi = new ethers.utils.Interface(abiJson);
+    return new ethers.ContractFactory(abi, bytecode);
+  }
 
 main().catch((error) => {
     console.error(error);

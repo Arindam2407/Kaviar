@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import {Receiver__factory, Blacklist__factory} from "../types";
-import { bscNet, poseidonAddr, receiver } from "../const";
+import { bscNet, receiverBsc } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -22,9 +22,14 @@ async function main(){
     const userNewSignerWallet = new ethers.Wallet(process.env.userNewSigner ?? "");
     const userNewSigner = userNewSignerWallet.connect(provider);
 
-    const poseidon = await buildPoseidon();
-    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiver));
+    const blacklist = await new Blacklist__factory(userOldSigner).deploy();
 
+    await (blacklist).deployed();
+    console.log(blacklist.address);
+
+    const poseidon = await buildPoseidon();
+    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
+    const ETH_AMOUNT = ethers.utils.parseEther("0.001");
     const HEIGHT = 20;
     console.log("pass 1");
     const tree = new MerkleTree(
@@ -48,8 +53,20 @@ async function main(){
     const leafIndex = 0
     const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex])
     const commitment = "0x131d05841a55fe138852b423e66d766620a71c1b259254bea564839fb99e3f27"
-    const allowValue = "0x1a6dde72d78cdcb5cbb6678be64735040d7e8bffe5b7e08f7e2813239f71b125";
+    let allowValue = "0x1a6dde72d78cdcb5cbb6678be64735040d7e8bffe5b7e08f7e2813239f71b125";
+
+    const isBlacklisted= await blacklist
+    .connect(userOldSigner)
+    .isBlacklisted(relayerSigner.address);
+    
+    if(isBlacklisted) {
+        allowValue = "0x2e1d428a1a102b152ad9104dd679817ecbf0206a8427c40dc7210e59c3ee3ffc";
+        console.log("Proof will fail going forward as the deposit did not come from an honest actor")
+        process.exitCode = 1;
+    }
+    
     console.log(tree);
+    console.log(SubsetTree);
     
     await tree.insert(ethers.BigNumber.from(commitment));
     await SubsetTree.insert(ethers.BigNumber.from(allowValue));
@@ -75,6 +92,8 @@ async function main(){
         leafIndex
     );
 
+    const nullifierBigNumber = BigNumber.from(nullifier).toBigInt();
+
     // change this
     const witness = {
         // Public
@@ -83,7 +102,7 @@ async function main(){
         nullifierHash,
         withdrawMetadata,
         // Private (user keep)
-        nullifier: BigNumber.from(nullifier).toBigInt(),
+        nullifierBigNumber,
         path_index,
         path_elements,
         path_elements_subset

@@ -15,6 +15,16 @@ async function main() {
 
     await (blacklist).deployed();
     console.log(blacklist.address);
+
+    const relayerSignerWallet = new ethers.Wallet(process.env.relayerSigner ?? "");
+    const relayerSigner = relayerSignerWallet.connect(provider);
+
+    //blacklist relayerSigner
+    const tx = await blacklist
+    .connect(signer)
+    .blacklistAddress(relayerSigner.address);
+    
+    const receipt = await tx.wait();
 }
 
 main().catch((error) => {
