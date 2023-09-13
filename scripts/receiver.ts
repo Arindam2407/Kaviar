@@ -29,7 +29,6 @@ async function main(){
 
     const poseidon = await buildPoseidon();
     const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
-    const ETH_AMOUNT = ethers.utils.parseEther("0.001");
     const HEIGHT = 20;
     console.log("pass 1");
     const tree = new MerkleTree(
@@ -90,7 +89,7 @@ async function main(){
 
     const rootI = root.toBigInt();
 
-    const { root: subsetRoot, path_elements: path_elements_subset, path_index: path_index_subset } = await SubsetTree.path(
+    const { root: subsetRoot, path_elements: path_elements_subset } = await SubsetTree.path(
         leafIndex
     );
 

@@ -1,7 +1,7 @@
-export const poseidonAddr = "0x90543074042965ACAB09eFCE96CBF5CfFeA1a4f5";
+export const poseidonAddr = "0xd197d8ad452A2FA6D8c2832AE68C7795Ff7905e5";
 export const senderAddr = "0x9191Bab59eEB4b42A5ECad2Dd042e79Dec76E14E";
 
-export const poseidonBsc = "0x90543074042965ACAB09eFCE96CBF5CfFeA1a4f5";
+export const poseidonBsc = "0x97AAccF0d008fCe9d9e7e84C728CC2C393def1e1";
 export const receiverBsc = "0x9191Bab59eEB4b42A5ECad2Dd042e79Dec76E14E";
 
 export const goerliNet = {

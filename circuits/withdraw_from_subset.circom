@@ -66,11 +66,8 @@ template WithdrawFromSubset(levels, expectedValue) {
     signal input mainProof[levels];
     signal input subsetProof[levels];
 
-    component rawCommitmentHasher = Poseidon(1);
-    rawCommitmentHasher.inputs[0] <== nullifier;
-
     component commitmentHasher = Poseidon(2);
-    commitmentHasher.inputs[0] <== rawCommitmentHasher.out;
+    commitmentHasher.inputs[0] <== nullifier;
     commitmentHasher.inputs[1] <== 0;
 
     component nullifierHasher = Poseidon(3);
