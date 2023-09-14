@@ -72,9 +72,10 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
     ) internal override {
         (bytes32 commitment, bytes32 expectedValueHash, address depositor) = abi.decode(payload_, (bytes32, bytes32, address));
         uint32 insertedIndex = _insert(commitment);
+        uint32 insertedIndexSubset;
 
-        if(!isBlacklisted(depositor)){
-            uint32 insertedIndexSubset = _insertSubset(expectedValueHash);
+        if(!isBlacklisted(depositor)){ 
+            insertedIndexSubset = _insertSubset(expectedValueHash);
         }
 
         emit Deposit(commitment, insertedIndex, block.timestamp);
