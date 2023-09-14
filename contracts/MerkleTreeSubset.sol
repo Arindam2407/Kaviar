@@ -12,7 +12,7 @@ contract MerkleTreeSubset {
     uint256 public constant FIELD_SIZE_SUBSET =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
     uint256 public constant ZERO_VALUE_SUBSET =
-        543544072303548185257517071258879077999438229338741863745347926248040160894; // = keccak256("empty") % FIELD_SIZE
+        12723520216389513965340016709307614158265090849155178630105615478958633396456; // = keccak256("kaviar") % FIELD_SIZE
 
     HasherSubset public hasherSubset;
 
@@ -85,35 +85,35 @@ contract MerkleTreeSubset {
         return false;
     }
 
-    function _insertSubset(bytes32 _leaf) internal returns (uint32 index) {
-        uint32 currentIndex = nextIndexSubset;
+    function _insertSubset(bytes32 _leafSubset) internal returns (uint32 index) {
+        uint32 currentIndexSubset = nextIndexSubset;
         require(
-            currentIndex != uint32(2)**levelsSubset,
+            currentIndexSubset != uint32(2)**levelsSubset,
             "Merkle tree is full. No more leafs can be added"
         );
         nextIndexSubset += 1;
-        bytes32 currentLevelHash = _leaf;
+        bytes32 currentLevelHashSubset = _leafSubset;
         bytes32 left;
         bytes32 right;
 
         for (uint32 i = 0; i < levelsSubset; i++) {
-            if (currentIndex % 2 == 0) {
-                left = currentLevelHash;
+            if (currentIndexSubset % 2 == 0) {
+                left = currentLevelHashSubset;
                 right = zerosSubset[i];
 
-                filledSubtreesSubset[i] = currentLevelHash;
+                filledSubtreesSubset[i] = currentLevelHashSubset;
             } else {
                 left = filledSubtreesSubset[i];
-                right = currentLevelHash;
+                right = currentLevelHashSubset;
             }
 
-            currentLevelHash = hashLeftRightSubset(left, right);
+            currentLevelHashSubset = hashLeftRightSubset(left, right);
 
-            currentIndex /= 2;
+            currentIndexSubset /= 2;
         }
 
         currentRootIndexSubset = (currentRootIndexSubset + 1) % ROOT_HISTORY_SIZE_SUBSET;
-        rootsSubset[currentRootIndexSubset] = currentLevelHash;
+        rootsSubset[currentRootIndexSubset] = currentLevelHashSubset;
         return nextIndexSubset - 1;
     }
 }

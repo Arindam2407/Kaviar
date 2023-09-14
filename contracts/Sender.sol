@@ -35,12 +35,12 @@ contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubs
     @dev Deposit funds into the contract. The caller must send (for ETH) or approve (for ERC20) value equal to or `denomination` of this instance.
     @param _commitment the note commitment, which is PedersenHash(nullifier + secret)
   */
-    function deposit(bytes32 _commitment, bytes32 _expectedValueHash, address _depositor, string calldata destinationChain,
+    function deposit(bytes32 _commitment, string calldata destinationChain,
         string calldata destinationAddress) external payable nonReentrant {
         _processDeposit();
        require(msg.value > 0, 'Gas payment is required');
 
-        bytes memory payload = abi.encode(_commitment, _expectedValueHash, _depositor);
+        bytes memory payload = abi.encode(_commitment, msg.sender);
         gasService.payNativeGasForContractCall{ value: axelarGas }(
             address(this),
             destinationChain,

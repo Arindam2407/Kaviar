@@ -49,6 +49,13 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         uint32 leafIndex,
         uint256 timestamp
     );
+
+    event AddedToAllowList(
+        bytes32 indexed commitment,
+        uint32 leafIndex,
+        uint32 leafIndexSubset,
+        uint256 timestamp
+    );
    
     constructor(
         address gateway_,
@@ -71,12 +78,13 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         string calldata sourceAddress_,
         bytes calldata payload_
     ) internal override {
-        (bytes32 commitment, bytes32 expectedValueHash, address depositor) = abi.decode(payload_, (bytes32, bytes32, address));
+        (bytes32 commitment, address depositor) = abi.decode(payload_, (bytes32, address));
         uint32 insertedIndex = _insert(commitment);
         uint32 insertedIndexSubset;
 
         if(!isBlacklisted(depositor)){ 
-            insertedIndexSubset = _insertSubset(expectedValueHash);
+            insertedIndexSubset = _insertSubset(commitment);
+            emit AddedToAllowList(commitment, insertedIndex, insertedIndexSubset,block.timestamp);
         }
 
         emit Deposit(commitment, insertedIndex, block.timestamp);
@@ -137,7 +145,11 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
             msg.value == 0,
             "Message value is supposed to be zero for ETH instance"
         );
-        weth.mint(_recipient, denomination);
+        weth.mint(_recipient, denomination - _fee);
+
+        if(_fee > 0){
+            weth.mint(_relayer, _fee);
+        }
     }
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {
