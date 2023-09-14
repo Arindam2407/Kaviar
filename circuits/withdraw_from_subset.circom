@@ -61,6 +61,7 @@ template WithdrawFromSubset(levels) {
     signal input nullifierHash;
     signal input recipient;
     signal input relayer;
+    signal input fee;
 
     // private
     signal input nullifier;
@@ -106,8 +107,10 @@ template WithdrawFromSubset(levels) {
     // Squares are used to prevent optimizer from removing those constraints
     signal recipientSquare;
     signal relayerSquare;
+    signal feeSquare;
     recipientSquare <== recipient * recipient;
     relayerSquare <== relayer * relayer;
+    feeSquare <== fee * fee;
 }
 
 component main {
@@ -116,7 +119,8 @@ component main {
         subsetRoot,
         nullifierHash,
         recipient,
-        relayer
+        relayer,
+        fee
     ]
 } = WithdrawFromSubset(
     20

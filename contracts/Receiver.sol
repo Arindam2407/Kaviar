@@ -7,6 +7,7 @@ import "./MerkleTree.sol";
 import "./MerkleTreeSubset.sol";
 import "./Blacklist.sol";
 import "./WETH.sol";
+import "./Verifier.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { AxelarExecutable } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
 import { IAxelarGateway } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
@@ -24,7 +25,7 @@ interface IVerifier {
         uint256[2] calldata a,
         uint256[2][2] calldata b,
         uint256[2] calldata c,
-        uint256[5] calldata input
+        uint256[6] calldata input
     ) external view returns (bool);
 }
 
@@ -114,7 +115,8 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
                     uint256(_subsetRoot),
                     uint256(_nullifierHash),
                     uint256(uint160(_recipient)),
-                    uint256(uint160(_relayer))
+                    uint256(uint160(_relayer)),
+                    _fee
                 ]
             ),
             "Invalid withdraw proof"
