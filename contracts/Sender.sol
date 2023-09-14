@@ -10,42 +10,38 @@ import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { AxelarExecutable } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
 import { IAxelarGateway } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
 import { IAxelarGasService } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol';
-import "./verifiers/withdraw_from_subset_verifier.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubset, Blacklist, WithdrawFromSubsetVerifier {
-    using ProofLib for bytes;
-    using SafeERC20 for IERC20;
-
+contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubset, Blacklist {
     uint256 public immutable denomination;
-    
+    uint256 public axelarGas;
     IAxelarGasService gasService;
 
-    mapping(uint => bool) public nullifierHashes;
+    mapping(bytes32 => bool) public nullifierHashes;
 
     event Deposit(
-        uint indexed commitment,
-        uint leafIndex,
+        bytes32 indexed commitment,
+        uint32 leafIndex,
         uint256 timestamp
     );
    
-    constructor(address gateway_, address gasReceiver_, uint256 _denomination, address poseidon) 
-    AxelarExecutable(gateway_) MerkleTree(poseidon, bytes("empty").snarkHash()) 
-    MerkleTreeSubset(poseidon, bytes("allowed").snarkHash()) Blacklist(){
+    constructor(address gateway_, address gasReceiver_, uint256 _axelarGas, uint256 _denomination, address poseidon) 
+    AxelarExecutable(gateway_) MerkleTree(poseidon) MerkleTreeSubset(poseidon) {
         gasService = IAxelarGasService(gasReceiver_);
-        require(_denomination > 0, "denomination should be greater than 0");
         denomination = _denomination;
+        axelarGas = _axelarGas;
     }
 
-    function deposit(uint _commitment, string calldata destinationChain,
+    /**
+    @dev Deposit funds into the contract. The caller must send (for ETH) or approve (for ERC20) value equal to or `denomination` of this instance.
+    @param _commitment the note commitment, which is PedersenHash(nullifier + secret)
+  */
+    function deposit(bytes32 _commitment, bytes32 _expectedValueHash, address _depositor, string calldata destinationChain,
         string calldata destinationAddress) external payable nonReentrant {
-
         _processDeposit();
+       require(msg.value > 0, 'Gas payment is required');
 
-        require(msg.value > 0, 'Gas payment is required');
-
-        bytes memory payload = abi.encode(_commitment);
-        gasService.payNativeGasForContractCall{ value: msg.value }(
+        bytes memory payload = abi.encode(_commitment, _expectedValueHash, _depositor);
+        gasService.payNativeGasForContractCall{ value: axelarGas }(
             address(this),
             destinationChain,
             destinationAddress,
@@ -57,7 +53,7 @@ contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubs
 
     function _processDeposit() internal {
         require(
-            msg.value > denomination,
+            (msg.value - axelarGas) == denomination,
             "Please send exactly 0.1 ETH along with transaction"
         );
     }

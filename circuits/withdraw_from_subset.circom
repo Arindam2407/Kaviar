@@ -13,12 +13,14 @@ template DualMux() {
     out[1] <== (in[0] - in[1])*s + in[1];
 }
 
-template DoubleMerkleProof(levels, expectedValue) {
+template DoubleMerkleProof(levels) {
     signal input leaf;
+    signal input expectedValue;
     signal input root;
     signal input subsetRoot;
 
-    signal input path;
+    signal input mainProofIndices[levels];
+    signal input subsetProofIndices[levels];
     signal input mainProof[levels];
     signal input subsetProof[levels];
 
@@ -28,14 +30,12 @@ template DoubleMerkleProof(levels, expectedValue) {
     component hashers1[levels];
     component hashers2[levels];
 
-    component pathBits = Num2Bits(levels);
-    pathBits.in <== path;
-
     for (var i = 0; i < levels; i++) {
         selectors1[i] = DualMux();
         selectors1[i].in[0] <== i == 0 ? leaf : hashers1[i - 1].out;
         selectors1[i].in[1] <== mainProof[i];
-        selectors1[i].s <== pathBits.out[i];
+        selectors1[i].s <== mainProofIndices[i];
+
         hashers1[i] = Poseidon(2);
         hashers1[i].inputs[0] <== selectors1[i].out[0];
         hashers1[i].inputs[1] <== selectors1[i].out[1];
@@ -43,7 +43,8 @@ template DoubleMerkleProof(levels, expectedValue) {
         selectors2[i] = DualMux();
         selectors2[i].in[0] <== i == 0 ? expectedValue : hashers2[i - 1].out;
         selectors2[i].in[1] <== subsetProof[i];
-        selectors2[i].s <== pathBits.out[i];
+        selectors2[i].s <== subsetProofIndices[i];
+
         hashers2[i] = Poseidon(2);
         hashers2[i].inputs[0] <== selectors2[i].out[0];
         hashers2[i].inputs[1] <== selectors2[i].out[1];
@@ -53,43 +54,60 @@ template DoubleMerkleProof(levels, expectedValue) {
     subsetRoot === hashers2[levels - 1].out;
 }
 
-template WithdrawFromSubset(levels, expectedValue) {
+template WithdrawFromSubset(levels) {
     // public
     signal input root;
     signal input subsetRoot;
     signal input nullifierHash;
-    signal input withdrawMetadata;
+    signal input recipient;
+    signal input relayer;
 
     // private
     signal input nullifier;
-    signal input path;
+    signal input mainProofIndices[levels];
+    signal input subsetProofIndices[levels];
     signal input mainProof[levels];
     signal input subsetProof[levels];
+
+    component leafIndexNum = Bits2Num(levels);
+    for (var i = 0; i < levels; i++) {
+        leafIndexNum.in[i] <== mainProofIndices[i];
+    }
+
+    component nullifierHasher = Poseidon(3);
+    nullifierHasher.inputs[0] <== nullifier;
+    nullifierHasher.inputs[1] <== 1;
+    nullifierHasher.inputs[2] <== leafIndexNum.out;
+    nullifierHasher.out === nullifierHash;
 
     component commitmentHasher = Poseidon(2);
     commitmentHasher.inputs[0] <== nullifier;
     commitmentHasher.inputs[1] <== 0;
 
-    component nullifierHasher = Poseidon(3);
-    nullifierHasher.inputs[0] <== nullifier;
-    nullifierHasher.inputs[1] <== 1;
-    nullifierHasher.inputs[2] <== path;
-    nullifierHash === nullifierHasher.out;
+    component expectedValueHasher = Poseidon(2);
+    expectedValueHasher.inputs[0] <== 1;
+    expectedValueHasher.inputs[1] <== 1;
 
-    component doubleTree = DoubleMerkleProof(levels, expectedValue);
+    component doubleTree = DoubleMerkleProof(levels);
     doubleTree.leaf <== commitmentHasher.out;
+    doubleTree.expectedValue <== expectedValueHasher.out;
     doubleTree.root <== root;
     doubleTree.subsetRoot <== subsetRoot;
 
     for (var i = 0; i < levels; i++) {
         doubleTree.mainProof[i] <== mainProof[i];
         doubleTree.subsetProof[i] <== subsetProof[i];
+        doubleTree.mainProofIndices[i] <== mainProofIndices[i];
+        doubleTree.subsetProofIndices[i] <== subsetProofIndices[i];
     }
 
-    doubleTree.path <== path;
-
-    signal withdrawMetadataSquare;
-    withdrawMetadataSquare <== withdrawMetadata * withdrawMetadata;
+    // Add hidden signals to make sure that tampering with recipient will invalidate the snark proof
+    // Most likely it is not required, but it's better to stay on the safe side and it only takes 2 constraints
+    // Squares are used to prevent optimizer from removing those constraints
+    signal recipientSquare;
+    signal relayerSquare;
+    recipientSquare <== recipient * recipient;
+    relayerSquare <== relayer * relayer;
 }
 
 component main {
@@ -97,10 +115,9 @@ component main {
         root,
         subsetRoot,
         nullifierHash,
-        withdrawMetadata
+        recipient,
+        relayer
     ]
 } = WithdrawFromSubset(
-    20,
-    // keccak256("allowed") % p
-    11954255677048767585730959529592939615262310191150853775895456173962480955685
+    20
 );

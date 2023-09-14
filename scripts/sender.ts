@@ -3,15 +3,15 @@ import {ethers} from "hardhat";
 //@ts-ignore
 import { poseidonContract, buildPoseidon } from "circomlibjs";
 import { Sender__factory } from "../types";
-import { senderAddr, bscNet, receiverBsc } from "../const";
+import { senderAddr, mantleNet, receiverMantle } from "../const";
 
 dotenv.config();
 async function main() {
    
     const wallet = new ethers.Wallet(process.env.userOldSigner ?? "")
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        bscNet.url,
-        bscNet.chainId
+        mantleNet.url,
+        mantleNet.chainId
       );
     const signer = wallet.connect(provider);
     const balanceBN = await signer.getBalance();
@@ -28,7 +28,7 @@ async function main() {
     console.log("pass 1");
     const tx = await senderContract
     .connect(signer)
-    .deposit(deposit.commitment, bscNet.name, receiverBsc, { value: TOTAL_VALUE, gasLimit:1000000 });
+    .deposit(deposit.commitment, mantleNet.name, receiverMantle, { value: TOTAL_VALUE, gasLimit:1000000 });
     const receipt = await tx.wait();
     const events = await senderContract.queryFilter(
         senderContract.filters.Deposit(),

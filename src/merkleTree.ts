@@ -1,13 +1,11 @@
-import { BigNumber, BigNumberish } from "ethers";
-
 class JsStorage {
-    constructor(public db: { [key: string]: BigNumber } = {}) {}
+    constructor(public db: { [key: string]: string } = {}) {}
 
     get(key: string) {
         return this.db[key];
     }
 
-    get_or_element(key: string, defaultElement: BigNumber) {
+    get_or_element(key: string, defaultElement: string) {
         const element = this.db[key];
         if (element === undefined) {
             return defaultElement;
@@ -16,7 +14,7 @@ class JsStorage {
         }
     }
 
-    put(key: string, value: BigNumber) {
+    put(key: string, value: string) {
         if (key === undefined || value === undefined) {
             throw Error("key or value is undefined");
         }
@@ -27,7 +25,7 @@ class JsStorage {
         delete this.db[key];
     }
 
-    put_batch(key_values: { key: string; value: BigNumber }[]) {
+    put_batch(key_values: { key: string; value: string }[]) {
         key_values.forEach((element) => {
             this.db[element.key] = element.value;
         });
@@ -35,7 +33,7 @@ class JsStorage {
 }
 
 export interface Hasher {
-    hash(left: BigNumber, right: BigNumber): BigNumber;
+    hash(left: string, right: string): string;
 }
 
 interface Handler {
@@ -43,12 +41,11 @@ interface Handler {
 }
 
 export class MerkleTree {
-    zero_values: BigNumber[];
+    zero_values: string[];
     public totalElements: number;
 
     constructor(
         public n_levels: number,
-        public zV: string,
         public prefix: string,
         public hasher: Hasher,
         public storage = new JsStorage()
@@ -57,14 +54,14 @@ export class MerkleTree {
         this.totalElements = 0;
 
         let current_zero_value =
-            BigNumber.from(zV);
+            "21663839004416932945382355908790599225266501822907911457504978515578255421292";
         this.zero_values.push(current_zero_value);
         for (let i = 0; i < n_levels; i++) {
             current_zero_value = this.hasher.hash(
                 current_zero_value,
                 current_zero_value
             );
-            this.zero_values.push(current_zero_value);
+            this.zero_values.push(current_zero_value.toString());
         }
     }
 
@@ -84,12 +81,12 @@ export class MerkleTree {
 
     async path(index: number) {
         class PathTraverser {
-            path_elements: BigNumber[];
+            path_elements: string[];
             path_index: number[];
             constructor(
                 public prefix: string,
                 public storage: JsStorage,
-                public zero_values: BigNumber[]
+                public zero_values: string[]
             ) {
                 this.path_elements = [];
                 this.path_index = [];
@@ -128,12 +125,12 @@ export class MerkleTree {
         return {
             root,
             path_elements: traverser.path_elements,
-            path_index: index,
+            path_index: traverser.path_index,
             element,
         };
     }
 
-    async update(index: number, element: BigNumber, insert = false) {
+    async update(index: number, element: string, insert = false) {
         if (!insert && index >= this.totalElements) {
             throw Error("Use insert method for new elements.");
         } else if (insert && index < this.totalElements) {
@@ -141,14 +138,14 @@ export class MerkleTree {
         }
         try {
             class UpdateTraverser {
-                key_values_to_put: { key: string; value: BigNumber }[];
-                original_element: BigNumber = BigNumber.from(0);
+                key_values_to_put: { key: string; value: string }[];
+                original_element: string = "";
                 constructor(
                     public prefix: string,
                     public storage: JsStorage,
                     public hasher: Hasher,
-                    public current_element: BigNumber,
-                    public zero_values: BigNumber[]
+                    public current_element: string,
+                    public zero_values: string[]
                 ) {
                     this.key_values_to_put = [];
                 }
@@ -177,7 +174,7 @@ export class MerkleTree {
                         ),
                         this.zero_values[level]
                     );
-                    let left: BigNumber, right: BigNumber;
+                    let left: string, right: string;
                     if (element_index % 2 == 0) {
                         left = this.current_element;
                         right = sibling;
@@ -217,7 +214,7 @@ export class MerkleTree {
         }
     }
 
-    async insert(element: BigNumber) {
+    async insert(element: string) {
         const index = this.totalElements;
         await this.update(index, element, true);
         this.totalElements++;
@@ -237,7 +234,7 @@ export class MerkleTree {
         }
     }
 
-    getIndexByElement(element: BigNumber) {
+    getIndexByElement(element: string) {
         for (let i = this.totalElements - 1; i >= 0; i--) {
             const elementFromTree = this.storage.get(
                 MerkleTree.index_to_key(this.prefix, 0, i)

@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import {Receiver__factory, Blacklist__factory} from "../types";
-import { bscNet, receiverBsc } from "../const";
+import { mantleNet, receiverMantle } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -13,8 +13,8 @@ import path from "path";
 async function main(){
     const userOldSignerWallet = new ethers.Wallet(process.env.userOldSigner ?? "");
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        bscNet.url,
-        bscNet.chainId
+        mantleNet.url,
+        mantleNet.chainId
       );
     const userOldSigner = userOldSignerWallet.connect(provider);
     const relayerSignerWallet = new ethers.Wallet(process.env.relayerSigner ?? "");
@@ -28,7 +28,7 @@ async function main(){
     console.log(blacklist.address);
 
     const poseidon = await buildPoseidon();
-    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
+    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverMantle));
     const HEIGHT = 20;
     console.log("pass 1");
     const tree = new MerkleTree(

@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 import{ Receiver__factory } from  "../types";
-import { poseidonBsc } from "../const";
+import { poseidonMantle } from "../const";
 
 dotenv.config();
 async function main() {
@@ -22,7 +22,7 @@ async function main() {
         gateway,
         gasservice,
         ETH_AMOUNT,
-        poseidonBsc
+        poseidonMantle
     );
   
     await (receiver).deployed();

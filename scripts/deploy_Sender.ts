@@ -1,17 +1,17 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 import { Sender__factory } from  "../types";
-import { bscNet, poseidonAddr } from "../const";
+import { mantleNet, poseidonAddr } from "../const";
 
 dotenv.config();
 async function main() {
    
     const wallet = new ethers.Wallet(process.env.userOldSigner ?? "")
     const provider = new ethers.providers.StaticJsonRpcProvider(
-      bscNet.url,
-      bscNet.chainId
+      mantleNet.url,
+      mantleNet.chainId
     );
-  //  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-prebsc-1-s1.binance.org:8545", {name: "bsc", chainId: 97})
+  //  const provider = new ethers.providers.JsonRpcProvider("https://data-seed-premantle-1-s1.binance.org:8545", {name: "mantle", chainId: 97})
     const signer = wallet.connect(provider);
     // const balanceBN = await signer.getBalance();
     // const balance = Number(ethers.utils.formatEther(balanceBN));
@@ -23,8 +23,8 @@ async function main() {
     
     
     const verifier = await new Sender__factory(signer).deploy(
-        bscNet.gateway,
-        bscNet.gasservice,
+        mantleNet.gateway,
+        mantleNet.gasservice,
         ETH_AMOUNT,
         poseidonAddr
     );

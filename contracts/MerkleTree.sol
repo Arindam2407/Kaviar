@@ -1,120 +1,119 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-interface Poseidon {
-    function poseidon(uint256[2] calldata) external pure returns (uint);
+interface Hasher {
+    function poseidon(bytes32[2] calldata leftRight)
+        external
+        pure
+        returns (bytes32);
 }
 
 contract MerkleTree {
-
     uint256 public constant FIELD_SIZE =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
-        
-    uint public constant ROOT_HISTORY_SIZE = 30;
+    uint256 public constant ZERO_VALUE =
+        21663839004416932945382355908790599225266501822907911457504978515578255421292; // = keccak256("tornado") % FIELD_SIZE
+
+    Hasher public hasher;
 
     uint32 public immutable levels = 20;
 
-    error MerkleTreeCapacity();
+    // the following variables are made public for easier testing and debugging and
+    // are not supposed to be accessed in regular code
+    bytes32[] public filledSubtrees;
+    bytes32[] public zeros;
+    uint32 public currentRootIndex = 0;
+    uint32 public nextIndex = 0;
+    uint32 public constant ROOT_HISTORY_SIZE = 100;
+    bytes32[ROOT_HISTORY_SIZE] public roots;
 
-    Poseidon public hasher;
-    mapping (uint => uint) public zeros;
-    mapping (uint => uint) public filledSubtrees;
-    mapping (uint => uint) public roots;    
-    uint public currentRootIndex;
-    uint public nextIndex;
+    constructor(address _hasher) {
+        hasher = Hasher(_hasher);
 
-    constructor(address poseidon, uint zeroValue) {
-        hasher = Poseidon(poseidon);
-        for (uint i; i < levels;) {
-            zeros[i] = zeroValue;
-            filledSubtrees[i] = zeroValue;
-            zeroValue = hasher.poseidon([zeroValue, zeroValue]);
-            unchecked { ++i; }
+        bytes32 currentZero = bytes32(ZERO_VALUE);
+        zeros.push(currentZero);
+        filledSubtrees.push(currentZero);
+
+        for (uint32 i = 1; i < levels; i++) {
+            currentZero = hashLeftRight(currentZero, currentZero);
+            zeros.push(currentZero);
+            filledSubtrees.push(currentZero);
         }
-        roots[0] = zeroValue;
+
+        roots[0] = hashLeftRight(currentZero, currentZero);
     }
 
-    function getLastRoot() public view returns (uint) {
+    /**
+    @dev Hash 2 tree leaves, returns MiMC(_left, _right)
+  */
+    function hashLeftRight(bytes32 _left, bytes32 _right)
+        public
+        view
+        returns (bytes32)
+    {
+        require(
+            uint256(_left) < FIELD_SIZE,
+            "_left should be inside the field"
+        );
+        require(
+            uint256(_right) < FIELD_SIZE,
+            "_right should be inside the field"
+        );
+        bytes32[2] memory leftright = [_left, _right];
+        return hasher.poseidon(leftright);
+    }
+
+    /**
+    @dev Returns the last root
+  */
+    function getLastRoot() public view returns (bytes32) {
         return roots[currentRootIndex];
     }
 
-    function isKnownRoot(uint root) public view returns (bool) {
-        if (root == 0) return false;
-        uint checkIndex = currentRootIndex;
-        for (uint i; i < ROOT_HISTORY_SIZE;) {
-            if (root == roots[checkIndex]) return true;
-            if (checkIndex == 0) checkIndex = ROOT_HISTORY_SIZE;
-            unchecked {
-                ++i;
-                --checkIndex;
-            }
-        }
+    /**
+    @dev Whether the root is present in the root history
+  */
+    function isKnownRoot(bytes32 _root) public view returns (bool) {
+        if (_root == 0) return false;
+
+        uint32 i = currentRootIndex;
+        do {
+            if (_root == roots[i]) return true;
+            if (i == 0) i = ROOT_HISTORY_SIZE;
+            i--;
+        } while (i != currentRootIndex);
         return false;
     }
 
-    function insert(uint leaf) internal returns (uint) {
-        if (nextIndex == 1 << levels) revert MerkleTreeCapacity();
-        uint currentIndex = nextIndex;
-        uint currentHash = leaf;
-        uint left;
-        uint right;
-        for (uint i; i < levels;) {
+    function _insert(bytes32 _leaf) internal returns (uint32 index) {
+        uint32 currentIndex = nextIndex;
+        require(
+            currentIndex != uint32(2)**levels,
+            "Merkle tree is full. No more leafs can be added"
+        );
+        nextIndex += 1;
+        bytes32 currentLevelHash = _leaf;
+        bytes32 left;
+        bytes32 right;
+
+        for (uint32 i = 0; i < levels; i++) {
             if (currentIndex % 2 == 0) {
-                left = currentHash;
+                left = currentLevelHash;
                 right = zeros[i];
-                filledSubtrees[i] = currentHash;
+
+                filledSubtrees[i] = currentLevelHash;
             } else {
                 left = filledSubtrees[i];
-                right = currentHash;
+                right = currentLevelHash;
             }
 
-            require(
-            left < FIELD_SIZE,
-            "left should be inside the field");
+            currentLevelHash = hashLeftRight(left, right);
 
-            require(
-            right < FIELD_SIZE,
-            "right should be inside the field"
-            );
+            currentIndex /= 2;
+        }
 
-            currentHash = hasher.poseidon([left, right]);
-            unchecked {
-                ++i;
-                currentIndex >>= 1;
-            }
-        }
-        unchecked {
-            currentRootIndex = addmod(currentRootIndex, 1, ROOT_HISTORY_SIZE);
-            roots[currentRootIndex] = currentHash;
-            return nextIndex++;
-        }
-    }
-
-    function testInsert(uint leaf) public returns (uint) {
-        if (nextIndex == 1 << levels) revert MerkleTreeCapacity();
-        uint currentIndex = nextIndex;
-        uint currentHash = leaf;
-        uint left;
-        uint right;
-        for (uint i; i < levels;) {
-            if (currentIndex % 2 == 0) {
-                left = currentHash;
-                right = zeros[i];
-                filledSubtrees[i] = currentHash;
-            } else {
-                left = filledSubtrees[i];
-                right = currentHash;
-            }
-            currentHash = hasher.poseidon([left, right]);
-            unchecked {
-                ++i;
-                currentIndex >>= 1;
-            }
-        }
-        unchecked {
-            currentRootIndex = addmod(currentRootIndex, 1, ROOT_HISTORY_SIZE);
-            roots[currentRootIndex] = currentHash;
-            return nextIndex++;
-        }
+        currentRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE;
+        roots[currentRootIndex] = currentLevelHash;
+        return nextIndex - 1;
     }
 }

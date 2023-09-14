@@ -1,120 +1,119 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.10;
 
-interface PoseidonSubset {
-    function poseidon(uint256[2] calldata) external pure returns (uint);
+interface HasherSubset {
+    function poseidon(bytes32[2] calldata leftRight)
+        external
+        pure
+        returns (bytes32);
 }
 
 contract MerkleTreeSubset {
-
     uint256 public constant FIELD_SIZE_SUBSET =
         21888242871839275222246405745257275088548364400416034343698204186575808495617;
+    uint256 public constant ZERO_VALUE_SUBSET =
+        543544072303548185257517071258879077999438229338741863745347926248040160894; // = keccak256("empty") % FIELD_SIZE
 
-    uint public constant ROOT_HISTORY_SIZE_SUBSET = 30;
+    HasherSubset public hasherSubset;
 
     uint32 public immutable levelsSubset = 20;
 
-    error MerkleTreeSubsetCapacity();
+    // the following variables are made public for easier testing and debugging and
+    // are not supposed to be accessed in regular code
+    bytes32[] public filledSubtreesSubset;
+    bytes32[] public zerosSubset;
+    uint32 public currentRootIndexSubset = 0;
+    uint32 public nextIndexSubset = 0;
+    uint32 public constant ROOT_HISTORY_SIZE_SUBSET = 100;
+    bytes32[ROOT_HISTORY_SIZE_SUBSET] public rootsSubset;
 
-    PoseidonSubset public hasherSubset;
-    mapping (uint => uint) public zerosSubset;
-    mapping (uint => uint) public filledSubtreesSubset;
-    mapping (uint => uint) public rootsSubset;    
-    uint public currentRootIndexSubset;
-    uint public nextIndexSubset;
+    constructor(address _hasher) {
+        hasherSubset = HasherSubset(_hasher);
 
-    constructor(address poseidon, uint zeroValueSubset) {
-        hasherSubset = PoseidonSubset(poseidon);
-        for (uint i; i < levelsSubset;) {
-            zerosSubset[i] = zeroValueSubset;
-            filledSubtreesSubset[i] = zeroValueSubset;
-            zeroValueSubset = hasherSubset.poseidon([zeroValueSubset, zeroValueSubset]);
-            unchecked { ++i; }
+        bytes32 currentZeroSubset = bytes32(ZERO_VALUE_SUBSET);
+        zerosSubset.push(currentZeroSubset);
+        filledSubtreesSubset.push(currentZeroSubset);
+
+        for (uint32 i = 1; i < levelsSubset; i++) {
+            currentZeroSubset = hashLeftRightSubset(currentZeroSubset, currentZeroSubset);
+            zerosSubset.push(currentZeroSubset);
+            filledSubtreesSubset.push(currentZeroSubset);
         }
-        rootsSubset[0] = zeroValueSubset;
+
+        rootsSubset[0] = hashLeftRightSubset(currentZeroSubset, currentZeroSubset);
     }
 
-    function getLastRootSubset() public view returns (uint) {
+    /**
+    @dev Hash 2 tree leaves, returns MiMC(_left, _right)
+  */
+    function hashLeftRightSubset(bytes32 _left, bytes32 _right)
+        public
+        view
+        returns (bytes32)
+    {
+        require(
+            uint256(_left) < FIELD_SIZE_SUBSET,
+            "_left should be inside the field"
+        );
+        require(
+            uint256(_right) < FIELD_SIZE_SUBSET,
+            "_right should be inside the field"
+        );
+        bytes32[2] memory leftright = [_left, _right];
+        return hasherSubset.poseidon(leftright);
+    }
+
+    /**
+    @dev Returns the last root
+  */
+    function getLastRootSubset() public view returns (bytes32) {
         return rootsSubset[currentRootIndexSubset];
     }
 
-    function isKnownRootSubset(uint root) public view returns (bool) {
-        if (root == 0) return false;
-        uint checkIndex = currentRootIndexSubset;
-        for (uint i; i < ROOT_HISTORY_SIZE_SUBSET;) {
-            if (root == rootsSubset[checkIndex]) return true;
-            if (checkIndex == 0) checkIndex = ROOT_HISTORY_SIZE_SUBSET;
-            unchecked {
-                ++i;
-                --checkIndex;
-            }
-        }
+    /**
+    @dev Whether the root is present in the root history
+  */
+    function isKnownRootSubset(bytes32 _root) public view returns (bool) {
+        if (_root == 0) return false;
+
+        uint32 i = currentRootIndexSubset;
+        do {
+            if (_root == rootsSubset[i]) return true;
+            if (i == 0) i = ROOT_HISTORY_SIZE_SUBSET;
+            i--;
+        } while (i != currentRootIndexSubset);
         return false;
     }
 
-    function insertSubset(uint isBanned) internal returns (uint) {
-        if (nextIndexSubset == 1 << levelsSubset) revert MerkleTreeSubsetCapacity();
-        uint currentIndex = nextIndexSubset;
-        uint currentHash = isBanned;
-        uint left;
-        uint right;
-        for (uint i; i < levelsSubset;) {
+    function _insertSubset(bytes32 _leaf) internal returns (uint32 index) {
+        uint32 currentIndex = nextIndexSubset;
+        require(
+            currentIndex != uint32(2)**levelsSubset,
+            "Merkle tree is full. No more leafs can be added"
+        );
+        nextIndexSubset += 1;
+        bytes32 currentLevelHash = _leaf;
+        bytes32 left;
+        bytes32 right;
+
+        for (uint32 i = 0; i < levelsSubset; i++) {
             if (currentIndex % 2 == 0) {
-                left = currentHash;
+                left = currentLevelHash;
                 right = zerosSubset[i];
-                filledSubtreesSubset[i] = currentHash;
+
+                filledSubtreesSubset[i] = currentLevelHash;
             } else {
                 left = filledSubtreesSubset[i];
-                right = currentHash;
+                right = currentLevelHash;
             }
 
-            require(
-            left < FIELD_SIZE_SUBSET,
-            "left should be inside the field");
+            currentLevelHash = hashLeftRightSubset(left, right);
 
-            require(
-            right < FIELD_SIZE_SUBSET,
-            "right should be inside the field"
-            );
+            currentIndex /= 2;
+        }
 
-            currentHash = hasherSubset.poseidon([left, right]);
-            unchecked {
-                ++i;
-                currentIndex >>= 1;
-            }
-        }
-        unchecked {
-            currentRootIndexSubset = addmod(currentRootIndexSubset, 1, ROOT_HISTORY_SIZE_SUBSET);
-            rootsSubset[currentRootIndexSubset] = currentHash;
-            return nextIndexSubset++;
-        }
-    }
-
-    function testInsertSubset(uint leaf) public returns (uint) {
-        if (nextIndexSubset == 1 << levelsSubset) revert MerkleTreeSubsetCapacity();
-        uint currentIndex = nextIndexSubset;
-        uint currentHash = leaf;
-        uint left;
-        uint right;
-        for (uint i; i < levelsSubset;) {
-            if (currentIndex % 2 == 0) {
-                left = currentHash;
-                right = zerosSubset[i];
-                filledSubtreesSubset[i] = currentHash;
-            } else {
-                left = filledSubtreesSubset[i];
-                right = currentHash;
-            }
-            currentHash = hasherSubset.poseidon([left, right]);
-            unchecked {
-                ++i;
-                currentIndex >>= 1;
-            }
-        }
-        unchecked {
-            currentRootIndexSubset = addmod(currentRootIndexSubset, 1, ROOT_HISTORY_SIZE_SUBSET);
-            rootsSubset[currentRootIndexSubset] = currentHash;
-            return nextIndexSubset++;
-        }
+        currentRootIndexSubset = (currentRootIndexSubset + 1) % ROOT_HISTORY_SIZE_SUBSET;
+        rootsSubset[currentRootIndexSubset] = currentLevelHash;
+        return nextIndexSubset - 1;
     }
 }
