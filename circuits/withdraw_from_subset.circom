@@ -15,7 +15,6 @@ template DualMux() {
 
 template DoubleMerkleProof(levels) {
     signal input leaf;
-    signal input expectedValue;
     signal input root;
     signal input subsetRoot;
 
@@ -41,7 +40,7 @@ template DoubleMerkleProof(levels) {
         hashers1[i].inputs[1] <== selectors1[i].out[1];
 
         selectors2[i] = DualMux();
-        selectors2[i].in[0] <== i == 0 ? expectedValue : hashers2[i - 1].out;
+        selectors2[i].in[0] <== i == 0 ? leaf : hashers2[i - 1].out;
         selectors2[i].in[1] <== subsetProof[i];
         selectors2[i].s <== subsetProofIndices[i];
 
@@ -85,13 +84,8 @@ template WithdrawFromSubset(levels) {
     commitmentHasher.inputs[0] <== nullifier;
     commitmentHasher.inputs[1] <== 0;
 
-    component expectedValueHasher = Poseidon(2);
-    expectedValueHasher.inputs[0] <== 1;
-    expectedValueHasher.inputs[1] <== 1;
-
     component doubleTree = DoubleMerkleProof(levels);
     doubleTree.leaf <== commitmentHasher.out;
-    doubleTree.expectedValue <== expectedValueHasher.out;
     doubleTree.root <== root;
     doubleTree.subsetRoot <== subsetRoot;
 
