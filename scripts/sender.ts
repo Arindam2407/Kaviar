@@ -1,17 +1,18 @@
 import * as dotenv from "dotenv";
+// import { ethers } from "ethers";
 import {ethers} from "hardhat";
 //@ts-ignore
-import { poseidonContract, buildPoseidon } from "circomlibjs";
-import { Sender__factory } from "../types";
-import { senderAddr, mantleNet, receiverMantle } from "../const";
+import {poseidonContract, buildPoseidon } from "circomlibjs";
+import {Sender__factory} from "../types";
+import {senderAddr, bscNet, goerliNet, receiverBsc} from "../const";
 
 dotenv.config();
 async function main() {
-   
+
     const wallet = new ethers.Wallet(process.env.userOldSigner ?? "")
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        mantleNet.url,
-        mantleNet.chainId
+        goerliNet.url,
+        goerliNet.chainId
       );
     const signer = wallet.connect(provider);
     const balanceBN = await signer.getBalance();
@@ -20,15 +21,14 @@ async function main() {
 
     const poseidon = await buildPoseidon();
     const deposit = Deposit.new(poseidon);
-
     
     const senderContract = await new Sender__factory(signer).attach(ethers.utils.getAddress(senderAddr));
     console.log("signer:", signer)
-    const TOTAL_VALUE = ethers.utils.parseEther("0.002");
+    const TOTAL_VALUE = ethers.utils.parseEther("0.006");
     console.log("pass 1");
     const tx = await senderContract
     .connect(signer)
-    .deposit(deposit.commitment, mantleNet.name, receiverMantle, { value: TOTAL_VALUE, gasLimit:1000000 });
+    .deposit(deposit.commitment, bscNet.name, receiverBsc, { value: TOTAL_VALUE, gasLimit:10000000 });
     const receipt = await tx.wait();
     const events = await senderContract.queryFilter(
         senderContract.filters.Deposit(),
@@ -39,6 +39,13 @@ async function main() {
   
     console.log(receipt);
     console.log(events);
+    // deposit.leafIndex = events[0].args.leafIndex;
+    // console.log("nullifierHash: ", deposit.nullifierHash)
+    // console.log("Deposit gas cost", receipt.gasUsed.toNumber());
+ 
+  
+    // console.log("leafIndex: ",deposit.leafIndex)
+    // console.log("commitment: ",deposit.commitment)
 }
 
 function poseidonHash(poseidon: any, inputs: any): string {
@@ -78,15 +85,7 @@ class Deposit {
     }
 }
 
-function getPoseidonFactory(nInputs: number) {
-    const bytecode = poseidonContract.createCode(nInputs);
-    const abiJson = poseidonContract.generateABI(nInputs);
-    const abi = new ethers.utils.Interface(abiJson);
-    return new ethers.ContractFactory(abi, bytecode);
-  }
-
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
   })
-

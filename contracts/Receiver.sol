@@ -52,7 +52,6 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
 
     event AddedToAllowList(
         bytes32 indexed commitment,
-        uint32 leafIndex,
         uint32 leafIndexSubset,
         uint256 timestamp
     );
@@ -84,7 +83,7 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
 
         if(!isBlacklisted(depositor)){ 
             insertedIndexSubset = _insertSubset(commitment);
-            emit AddedToAllowList(commitment, insertedIndex, insertedIndexSubset,block.timestamp);
+            emit AddedToAllowList(commitment, insertedIndexSubset,block.timestamp);
         }
 
         emit Deposit(commitment, insertedIndex, block.timestamp);

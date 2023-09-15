@@ -17,7 +17,6 @@ template DoubleMerkleProof(levels) {
     signal input leaf;
     signal input root;
     signal input subsetRoot;
-
     signal input mainProofIndices[levels];
     signal input subsetProofIndices[levels];
     signal input mainProof[levels];
@@ -85,6 +84,7 @@ template WithdrawFromSubset(levels) {
     commitmentHasher.inputs[1] <== 0;
 
     component doubleTree = DoubleMerkleProof(levels);
+
     doubleTree.leaf <== commitmentHasher.out;
     doubleTree.root <== root;
     doubleTree.subsetRoot <== subsetRoot;
