@@ -54,7 +54,7 @@ export class MerkleTree {
         this.totalElements = 0;
 
         let current_zero_value =
-            "12723520216389513965340016709307614158265090849155178630105615478958633396456";
+        "21663839004416932945382355908790599225266501822907911457504978515578255421292";
         this.zero_values.push(current_zero_value);
         for (let i = 0; i < n_levels; i++) {
             current_zero_value = this.hasher.hash(

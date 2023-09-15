@@ -1,8 +1,8 @@
-export const senderAddr = "0x21445f555412A48c8613B34f7569EDcC919FBFcd";
-export const poseidonAddr = "0x327eC59de20CE3a4E43BA4E987e2cdd160553874";
-export const poseidonBsc = "0x83290f493E12086bcCe8823b55f40bdc2Cd2F7dA";
-export const verifierBsc = "0x49ac4e633E705Ff454b4980F57d2cbC362E9F961";
-export const receiverBsc = "0x8a29dda90CC2F6917e48138f4Edcd65a2515e72a";
+export const senderAddr = "0xBA42D8F8fC139DD8435fc44e9B115AE5372158bA";
+export const poseidonAddr = "0x681BE3f0C20D1e671F14b887063439d313ccd4d5";
+export const poseidonBsc = "0x36976cE49d734dFea882799F9C8F8EE37d4301c3";
+export const verifierBsc = "0xc29bcFEfc3560ce4f1eAA05A932f3e9cE4A37daB";
+export const receiverBsc = "0x16474bbf9093DC420457d8C146Db5C1cF2ee6211";
 
 export const goerliNet = {
     url: "https://eth-goerli.g.alchemy.com/v2/wQZhZrGooqQlJMi44xtV3WQEAlhY8Ycz",

@@ -26,7 +26,7 @@ async function main(){
     const blacklist = await new Blacklist__factory(userOldSigner).deploy();
 
     await (blacklist).deployed();
-    console.log(blacklist.address);
+    console.log(`Blacklist address: ${blacklist.address}`);
 
     const poseidon = await buildPoseidon();
 
@@ -37,28 +37,27 @@ async function main(){
     console.log("pass 1");
     const tree = new MerkleTree(
         HEIGHT,
-        "12723520216389513965340016709307614158265090849155178630105615478958633396456",
+        "test",
         new PoseidonHasher(poseidon)
     );
 
     const SubsetTree = new MerkleTree(
         HEIGHT,
-        "12723520216389513965340016709307614158265090849155178630105615478958633396456",
+        "test",
         new PoseidonHasher(poseidon)
     );
     
     const nullifier = new Uint8Array([
-        108,  8,   4, 142, 113, 
-        33,   22, 53, 176, 112, 
-        151,  78,  72, 16,  49
+        119,  75, 211, 227, 149,
+        233, 174,  69,   9, 136,
+        205,  48,  80, 221,  32
     ])
 
     const leafIndex = 0
+    const leafIndexSubset = 0;
+
     const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
-    const commitment = poseidonHash(poseidon, [nullifier, 0]);
-    
-    console.log(tree);
-    console.log(SubsetTree);
+    const commitment = "0x28286716db33648ce1afae30085e068e377bf5128ee99e2726d01887e2ff9462";
     
     await tree.insert(commitment);
     await SubsetTree.insert(commitment);
@@ -67,18 +66,9 @@ async function main(){
     const relayer = await relayerSigner.getAddress();
     const fee = 0;
 
-    const { root, path_elements, path_index } = await tree.path(
-         leafIndex
-    );
+    const { root, path_elements, path_index } = await tree.path(leafIndex);
 
-    const { root: subsetRoot, 
-            path_elements: path_elements_subset, 
-            path_index: path_index_subset } = await 
-            SubsetTree.path(
-            leafIndex
-    );
-
-    const nullifierBigInt = BigNumber.from(nullifier).toBigInt();
+    const { root: subsetRoot, path_elements: path_elements_subset, path_index: path_index_subset } = await SubsetTree.path(leafIndexSubset);
     
     const witness = {
         // Public
@@ -89,11 +79,11 @@ async function main(){
         relayer,
         fee,
         // Private (user keep)
-        nullifierBigInt,
-        path_index,
-        path_index_subset,
-        path_elements,
-        path_elements_subset
+        nullifier: BigNumber.from(nullifier).toBigInt(),
+        mainProofIndices: path_index,
+        subsetProofIndices: path_index_subset,
+        mainProof: path_elements,
+        subsetProof: path_elements_subset
     };
 
     console.log(witness)
@@ -153,7 +143,33 @@ async function prove(witness: any): Promise<Proof> {
     return solProof;
 }
 
+class Deposit {
+    public constructor(
+        public readonly nullifier: Uint8Array,
+        public poseidon: any,
+        public leafIndex?: number
+    ) {
+        this.poseidon = poseidon;
+    }
+    static new(poseidon: any) {
+        // random nullifier (private note)
+        // here we only have private nullifier 
+        const nullifier = ethers.utils.randomBytes(15);
+        return new this(nullifier, poseidon);
+    }
+    // get hash of secret (nullifier)
+    get commitment() {
+        return poseidonHash(this.poseidon, [this.nullifier, 0]);
+    }
+    // get hash f nullifierhash (nulifier+1+index)
+    get nullifierHash() {
+        if (!this.leafIndex && this.leafIndex !== 0)
+            throw Error("leafIndex is unset yet");
+        return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
+    }
+}
+
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
-})
+  })

@@ -24,7 +24,7 @@ async function main() {
     
     const senderContract = await new Sender__factory(signer).attach(ethers.utils.getAddress(senderAddr));
     console.log("signer:", signer)
-    const TOTAL_VALUE = ethers.utils.parseEther("0.006");
+    const TOTAL_VALUE = ethers.utils.parseEther("0.01");
     console.log("pass 1");
     const tx = await senderContract
     .connect(signer)
@@ -36,16 +36,7 @@ async function main() {
     );
 
     console.log("nullifier: ", deposit.nullifier)
-  
-    console.log(receipt);
-    console.log(events);
-    // deposit.leafIndex = events[0].args.leafIndex;
-    // console.log("nullifierHash: ", deposit.nullifierHash)
-    // console.log("Deposit gas cost", receipt.gasUsed.toNumber());
- 
-  
-    // console.log("leafIndex: ",deposit.leafIndex)
-    // console.log("commitment: ",deposit.commitment)
+    console.log("commitment: ",deposit.commitment)
 }
 
 function poseidonHash(poseidon: any, inputs: any): string {
@@ -84,6 +75,13 @@ class Deposit {
         return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
     }
 }
+
+function getPoseidonFactory(nInputs: number) {
+    const bytecode = poseidonContract.createCode(nInputs);
+    const abiJson = poseidonContract.generateABI(nInputs);
+    const abi = new ethers.utils.Interface(abiJson);
+    return new ethers.ContractFactory(abi, bytecode);
+  }
 
 main().catch((error) => {
     console.error(error);
