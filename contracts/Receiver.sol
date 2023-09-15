@@ -144,11 +144,7 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
             msg.value == 0,
             "Message value is supposed to be zero for ETH instance"
         );
-        weth.mint(_recipient, denomination - _fee);
-
-        if(_fee > 0){
-            weth.mint(_relayer, _fee);
-        }
+        weth.mint(_recipient, denomination);
     }
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {

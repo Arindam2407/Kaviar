@@ -48,16 +48,16 @@ async function main(){
     );
     
     const nullifier = new Uint8Array([
-        119,  75, 211, 227, 149,
-        233, 174,  69,   9, 136,
-        205,  48,  80, 221,  32
+        134,  27, 184,  14,  59,
+  124, 171, 167,  70, 230,
+  218, 244, 248, 104, 220
     ])
 
     const leafIndex = 0
     const leafIndexSubset = 0;
 
     const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
-    const commitment = "0x28286716db33648ce1afae30085e068e377bf5128ee99e2726d01887e2ff9462";
+    const commitment = "0x0e5a2ad31d0d26da4cc42b11ad0de23918a0fa692319f0763efb73c1a0eeb6bb";
     
     await tree.insert(commitment);
     await SubsetTree.insert(commitment);
