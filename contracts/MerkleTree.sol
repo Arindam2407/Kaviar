@@ -19,13 +19,15 @@ contract MerkleTree {
     uint32 public immutable levels = 20;
 
     // the following variables are made public for easier testing and debugging and
-    // are not supposed to be accessed in regular code
+   // are not supposed to be accessed in regular code
     bytes32[] public filledSubtrees;
     bytes32[] public zeros;
     uint32 public currentRootIndex = 0;
     uint32 public nextIndex = 0;
     uint32 public constant ROOT_HISTORY_SIZE = 100;
     bytes32[ROOT_HISTORY_SIZE] public roots;
+
+    event RootAdded(uint32 index, bytes32 hashValue);
 
     constructor(address _hasher) {
         hasher = Hasher(_hasher);
@@ -114,6 +116,7 @@ contract MerkleTree {
 
         currentRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE;
         roots[currentRootIndex] = currentLevelHash;
+        emit RootAdded(currentRootIndex, currentLevelHash);
         return nextIndex - 1;
     }
 }

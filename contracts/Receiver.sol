@@ -55,6 +55,8 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         uint32 leafIndexSubset,
         uint256 timestamp
     );
+
+    event DepositorBlacklisted(address depositor);
    
     constructor(
         address gateway_,
@@ -84,6 +86,8 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         if(!isBlacklisted(depositor)){ 
             insertedIndexSubset = _insertSubset(commitment);
             emit AddedToAllowList(commitment, insertedIndexSubset,block.timestamp);
+        } else {
+            emit DepositorBlacklisted(depositor);
         }
 
         emit Deposit(commitment, insertedIndex, block.timestamp);

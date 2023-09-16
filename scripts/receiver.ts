@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import { Receiver__factory, Blacklist__factory } from "../types";
-import { bscNet, poseidonAddr, receiverBsc } from "../const";
+import { lineaNet, poseidonAddr, receiverLinea } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -12,8 +12,8 @@ import path from "path";
 
 async function main(){
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        bscNet.url,
-        bscNet.chainId
+        lineaNet.url,
+        lineaNet.chainId
     );
 
     const userOldSignerWallet = new ethers.Wallet(process.env.userOldSigner ?? "");
@@ -30,7 +30,7 @@ async function main(){
 
     const poseidon = await buildPoseidon();
 
-    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
+    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverLinea));
 
     const HEIGHT = 20;
 
@@ -48,16 +48,16 @@ async function main(){
     );
     
     const nullifier = new Uint8Array([
-        134,  27, 184,  14,  59,
-  124, 171, 167,  70, 230,
-  218, 244, 248, 104, 220
+        78, 191, 127, 137, 140,
+  195, 177, 206, 102, 131,
+  171, 254, 136, 202, 171
     ])
 
     const leafIndex = 0
     const leafIndexSubset = 0;
 
     const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
-    const commitment = "0x0e5a2ad31d0d26da4cc42b11ad0de23918a0fa692319f0763efb73c1a0eeb6bb";
+    const commitment = "0x0cd45d40e40c4d685022a7d15754ab8b484be4ded7720d38a1c1bff3c5405201";
     
     await tree.insert(commitment);
     await SubsetTree.insert(commitment);
@@ -93,7 +93,7 @@ async function main(){
 
     const txWithdraw = await receiverContract
         .connect(relayerSigner)
-        .withdraw(solProof, root, subsetRoot, nullifierHash, recipient, relayer, fee);
+        .withdraw(solProof, root, subsetRoot, nullifierHash, recipient, relayer, fee, { gasLimit: 1000000 }) ;
     const receiptWithdraw = await txWithdraw.wait();
     console.log("Withdraw gas cost", receiptWithdraw.gasUsed.toNumber()); 
 }
@@ -172,4 +172,4 @@ class Deposit {
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
-  })
+})

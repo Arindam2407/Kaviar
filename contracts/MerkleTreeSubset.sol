@@ -27,6 +27,8 @@ contract MerkleTreeSubset {
     uint32 public constant ROOT_HISTORY_SIZE_SUBSET = 100;
     bytes32[ROOT_HISTORY_SIZE_SUBSET] public rootsSubset;
 
+    event RootAddedSubset(uint32 index, bytes32 hashValue);
+
     constructor(address _hasher) {
         hasherSubset = HasherSubset(_hasher);
 
@@ -114,6 +116,7 @@ contract MerkleTreeSubset {
 
         currentRootIndexSubset = (currentRootIndexSubset + 1) % ROOT_HISTORY_SIZE_SUBSET;
         rootsSubset[currentRootIndexSubset] = currentLevelHashSubset;
+        emit RootAddedSubset(currentRootIndexSubset, currentLevelHashSubset);
         return nextIndexSubset - 1;
     }
 }

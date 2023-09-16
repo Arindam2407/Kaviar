@@ -15,12 +15,13 @@ template DualMux() {
 
 template DoubleMerkleProof(levels) {
     signal input leaf;
-    signal input root;
-    signal input subsetRoot;
     signal input mainProofIndices[levels];
     signal input subsetProofIndices[levels];
     signal input mainProof[levels];
     signal input subsetProof[levels];
+
+    signal output root;
+    signal output subsetRoot;
 
     component selectors1[levels];
     component selectors2[levels];
@@ -48,8 +49,8 @@ template DoubleMerkleProof(levels) {
         hashers2[i].inputs[1] <== selectors2[i].out[1];
     }
 
-    root === hashers1[levels - 1].out;
-    subsetRoot === hashers2[levels - 1].out;
+    root <== hashers1[levels - 1].out;
+    subsetRoot <== hashers2[levels - 1].out;
 }
 
 template WithdrawFromSubset(levels) {
@@ -86,8 +87,6 @@ template WithdrawFromSubset(levels) {
     component doubleTree = DoubleMerkleProof(levels);
 
     doubleTree.leaf <== commitmentHasher.out;
-    doubleTree.root <== root;
-    doubleTree.subsetRoot <== subsetRoot;
 
     for (var i = 0; i < levels; i++) {
         doubleTree.mainProof[i] <== mainProof[i];
@@ -95,6 +94,9 @@ template WithdrawFromSubset(levels) {
         doubleTree.mainProofIndices[i] <== mainProofIndices[i];
         doubleTree.subsetProofIndices[i] <== subsetProofIndices[i];
     }
+
+    doubleTree.root === root;
+    doubleTree.subsetRoot === subsetRoot;
 
     // Add hidden signals to make sure that tampering with recipient will invalidate the snark proof
     // Most likely it is not required, but it's better to stay on the safe side and it only takes 2 constraints
