@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import { Receiver__factory, Blacklist__factory } from "../types";
-import { lineaNet, poseidonAddr, receiverLinea } from "../const";
+import { bscNet, poseidonAddr, receiverBsc } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -12,8 +12,8 @@ import path from "path";
 
 async function main(){
     const provider = new ethers.providers.StaticJsonRpcProvider(
-        lineaNet.url,
-        lineaNet.chainId
+        bscNet.url,
+        bscNet.chainId
     );
 
     const userOldSignerWallet = new ethers.Wallet(process.env.userOldSigner ?? "");
@@ -30,7 +30,7 @@ async function main(){
 
     const poseidon = await buildPoseidon();
 
-    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverLinea));
+    const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
 
     const HEIGHT = 20;
 

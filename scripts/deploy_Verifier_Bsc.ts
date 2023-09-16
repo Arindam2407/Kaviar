@@ -1,14 +1,14 @@
 import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 import{ Verifier__factory } from  "../types";
-import { lineaNet } from "../const";
+import { bscNet } from "../const";
 
 dotenv.config();
 async function main() {   
     const wallet = new ethers.Wallet(process.env.userOldSigner ?? "");
     const provider = new ethers.providers.StaticJsonRpcProvider(
-      lineaNet.url,
-      lineaNet.chainId
+      bscNet.url,
+      bscNet.chainId
       );
     const signer = wallet.connect(provider);
     const balanceBN = await signer.getBalance();

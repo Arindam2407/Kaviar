@@ -2,15 +2,15 @@ import * as dotenv from "dotenv";
 import { ethers } from "ethers";
 //@ts-ignore
 import { poseidonContract, buildPoseidon } from "circomlibjs";
-import { lineaNet } from "../const";
+import { bscNet } from "../const";
 
 dotenv.config();
 async function main() {
    
   const wallet = new ethers.Wallet(process.env.userOldSigner ?? "");
   const provider = new ethers.providers.StaticJsonRpcProvider(
-    lineaNet.url,
-    lineaNet.chainId
+    bscNet.url,
+    bscNet.chainId
   );
 
   const signer = wallet.connect(provider);
