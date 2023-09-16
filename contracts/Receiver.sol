@@ -75,8 +75,8 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
    // move to sender later
    // Handles calls created by setAndSend. Updates this contract's value
    function _execute(
-        string calldata sourceChain_,
-        string calldata sourceAddress_,
+        string calldata,
+        string calldata,
         bytes calldata payload_
     ) internal override {
         (bytes32 commitment, address depositor) = abi.decode(payload_, (bytes32, address));
@@ -148,7 +148,11 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
             msg.value == 0,
             "Message value is supposed to be zero for ETH instance"
         );
-        weth.mint(_recipient, denomination);
+        weth.mint(_recipient, denomination - _fee);
+
+        if(_fee > 0){
+            weth.mint(_relayer, _fee);
+        }
     }
 
     function isSpent(bytes32 _nullifierHash) public view returns (bool) {

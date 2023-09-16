@@ -16,7 +16,7 @@ const config: HardhatUserConfig = {
           gas:10000000,
           timeout: 60000
         },
-        linea: {
+        bsc: {
           url: "https://linea-goerli.infura.io/v3/d4e151b7f55949c197d22923a169ff55",
           chainId: 59140,
           accounts: [`${userOldSigner}`, `0x${relayerSigner}`, `0x${userNewSigner}`],
