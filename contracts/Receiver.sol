@@ -6,7 +6,7 @@ pragma experimental ABIEncoderV2;
 import "./MerkleTree.sol";
 import "./MerkleTreeSubset.sol";
 import "./WETH.sol";
-import "./Verifier.sol";
+import "../build/Verifier.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { AxelarExecutable } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
 import { IAxelarGateway } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
