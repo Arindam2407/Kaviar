@@ -3,15 +3,12 @@
 pragma solidity ^0.8.10;
 pragma experimental ABIEncoderV2;
 
-import "./MerkleTree.sol";
-import "./MerkleTreeSubset.sol";
-import "./Blacklist.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { AxelarExecutable } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/executable/AxelarExecutable.sol';
 import { IAxelarGateway } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGateway.sol';
 import { IAxelarGasService } from '@axelar-network/axelar-gmp-sdk-solidity/contracts/interfaces/IAxelarGasService.sol';
 
-contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubset, Blacklist {
+contract Sender is AxelarExecutable, ReentrancyGuard {
     uint256 public immutable denomination;
     uint256 public axelarGas;
     IAxelarGasService gasService;
@@ -24,8 +21,8 @@ contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubs
         uint256 timestamp
     );
    
-    constructor(address gateway_, address gasReceiver_, uint256 _axelarGas, uint256 _denomination, address poseidon) 
-    AxelarExecutable(gateway_) MerkleTree(poseidon) MerkleTreeSubset(poseidon) {
+    constructor(address gateway_, address gasReceiver_, uint256 _axelarGas, uint256 _denomination) 
+    AxelarExecutable(gateway_) {
         gasService = IAxelarGasService(gasReceiver_);
         denomination = _denomination;
         axelarGas = _axelarGas;
@@ -35,12 +32,12 @@ contract Sender is AxelarExecutable, ReentrancyGuard, MerkleTree, MerkleTreeSubs
     @dev Deposit funds into the contract. The caller must send (for ETH) or approve (for ERC20) value equal to or `denomination` of this instance.
     @param _commitment the note commitment, which is PedersenHash(nullifier + secret)
   */
-    function deposit(bytes32 _commitment, string calldata destinationChain,
+    function deposit(bytes32 _commitment, address _subsetTreeAddress, string calldata destinationChain,
         string calldata destinationAddress) external payable nonReentrant {
         _processDeposit();
        require(msg.value > 0, 'Gas payment is required');
 
-        bytes memory payload = abi.encode(_commitment, msg.sender);
+        bytes memory payload = abi.encode(_commitment, _subsetTreeAddress, msg.sender);
         gasService.payNativeGasForContractCall{ value: axelarGas }(
             address(this),
             destinationChain,

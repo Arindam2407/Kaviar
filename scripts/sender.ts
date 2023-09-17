@@ -3,8 +3,8 @@ import * as dotenv from "dotenv";
 import {ethers} from "hardhat";
 //@ts-ignore
 import {poseidonContract, buildPoseidon } from "circomlibjs";
-import {Sender__factory} from "../types";
-import {senderAddr, bscNet, goerliNet, receiverBsc} from "../const";
+import {Sender__factory, MerkleTreeSubset__factory} from "../types";
+import {senderAddr, MTSBsc, bscNet, goerliNet, receiverBsc} from "../const";
 
 dotenv.config();
 async function main() {
@@ -13,22 +13,17 @@ async function main() {
     const provider = new ethers.providers.StaticJsonRpcProvider(
         goerliNet.url,
         goerliNet.chainId
-      );
+    );
     const signer = wallet.connect(provider);
-    const balanceBN = await signer.getBalance();
-    const balance = Number(ethers.utils.formatEther(balanceBN));
-    console.log(`Wallet balance ${balance}`);
 
     const poseidon = await buildPoseidon();
     const deposit = Deposit.new(poseidon);
     
     const senderContract = await new Sender__factory(signer).attach(ethers.utils.getAddress(senderAddr));
-    console.log("signer:", signer)
-    const TOTAL_VALUE = ethers.utils.parseEther("0.031");
-    console.log("pass 1");
+    const TOTAL_VALUE = ethers.utils.parseEther("0.01");
     const tx = await senderContract
     .connect(signer)
-    .deposit(deposit.commitment, bscNet.name, receiverBsc, { value: TOTAL_VALUE, gasLimit:10000000 });
+    .deposit(deposit.commitment, MTSBsc, bscNet.name, receiverBsc, { value: TOTAL_VALUE, gasLimit:10000000 });
     const receipt = await tx.wait();
     const events = await senderContract.queryFilter(
         senderContract.filters.Deposit(),

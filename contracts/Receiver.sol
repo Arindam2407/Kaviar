@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 
 import "./MerkleTree.sol";
 import "./MerkleTreeSubset.sol";
-import "./Blacklist.sol";
 import "./WETH.sol";
 import "./Verifier.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -29,7 +28,7 @@ interface IVerifier {
     ) external view returns (bool);
 }
 
-contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, ReentrancyGuard {
+contract Receiver is AxelarExecutable, MerkleTree, ReentrancyGuard {
     uint256 public immutable denomination;
     IVerifier public immutable verifier;
     WETHToken public weth;
@@ -64,7 +63,7 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         IVerifier _verifier,
         uint256 _denomination,
         address poseidon
-    ) MerkleTree(poseidon) MerkleTreeSubset(poseidon) AxelarExecutable(gateway_) {
+    ) MerkleTree(poseidon) AxelarExecutable(gateway_) {
         gasService = IAxelarGasService(gasReceiver_);
         require(_denomination > 0, "denomination should be greater than 0");
         verifier = _verifier;
@@ -79,15 +78,28 @@ contract Receiver is AxelarExecutable, MerkleTree, MerkleTreeSubset, Blacklist, 
         string calldata,
         bytes calldata payload_
     ) internal override {
-        (bytes32 commitment, address depositor) = abi.decode(payload_, (bytes32, address));
+        (bytes32 commitment, address subsetTreeAddress, address depositor) = abi.decode(payload_, (bytes32, address, address));
         uint32 insertedIndex = _insert(commitment);
         uint32 insertedIndexSubset;
 
-        if(!isBlacklisted(depositor)){ 
-            insertedIndexSubset = _insertSubset(commitment);
-            emit AddedToAllowList(commitment, insertedIndexSubset,block.timestamp);
+        MerkleTreeSubset mts = MerkleTreeSubset(subsetTreeAddress);
+
+        bool typeOfList = mts.typeOfList();
+
+        if(typeOfList){
+            if(!mts.isBlacklisted(depositor)){ 
+                insertedIndexSubset = mts._insertSubset(commitment);
+                emit AddedToAllowList(commitment, insertedIndexSubset,block.timestamp);
+            } else {
+                emit DepositorBlacklisted(depositor);
+            }
         } else {
-            emit DepositorBlacklisted(depositor);
+            if(mts.isAllowlisted(depositor)){ 
+                insertedIndexSubset = mts._insertSubset(commitment);
+                emit AddedToAllowList(commitment, insertedIndexSubset,block.timestamp);
+            } else {
+                emit DepositorBlacklisted(depositor);
+            }
         }
 
         emit Deposit(commitment, insertedIndex, block.timestamp);

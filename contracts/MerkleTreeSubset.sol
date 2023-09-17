@@ -29,7 +29,19 @@ contract MerkleTreeSubset {
 
     event RootAddedSubset(uint32 index, bytes32 hashValue);
 
-    constructor(address _hasher) {
+    address public owner;
+    bool public typeOfList;
+    mapping(address => bool) public blacklist;
+    mapping(address => bool) public allowlist;
+
+    modifier isOwnable {
+        require(msg.sender == owner, "Not the owner");
+        _;
+    }
+
+    constructor(address _hasher, bool _typeOfList) {
+        owner = msg.sender;
+        typeOfList = _typeOfList;
         hasherSubset = HasherSubset(_hasher);
 
         bytes32 currentZeroSubset = bytes32(ZERO_VALUE_SUBSET);
@@ -87,7 +99,7 @@ contract MerkleTreeSubset {
         return false;
     }
 
-    function _insertSubset(bytes32 _leafSubset) internal returns (uint32 index) {
+    function _insertSubset(bytes32 _leafSubset) public returns (uint32 index) {
         uint32 currentIndexSubset = nextIndexSubset;
         require(
             currentIndexSubset != uint32(2)**levelsSubset,
@@ -118,5 +130,33 @@ contract MerkleTreeSubset {
         rootsSubset[currentRootIndexSubset] = currentLevelHashSubset;
         emit RootAddedSubset(currentRootIndexSubset, currentLevelHashSubset);
         return nextIndexSubset - 1;
+    }
+
+    function blacklistAddress(address badActor) public isOwnable {
+        require(!(isBlacklisted(badActor)),"Address already blacklisted");
+        blacklist[badActor] = true;
+    }
+
+    function unBlacklistAddress(address goodActor) public isOwnable {
+        require(isBlacklisted(goodActor),"Address not blacklisted");
+        blacklist[goodActor] = false;
+    }
+
+    function isBlacklisted(address actor) public view returns(bool) {
+        return blacklist[actor];
+    }
+
+    function allowlistAddress(address goodActor) public isOwnable {
+        require(!(isAllowlisted(goodActor)),"Address already allowed");
+        blacklist[goodActor] = true;
+    }
+
+    function unAllowlistAddress(address badActor) public isOwnable {
+        require(isAllowlisted(badActor),"Address not allowed");
+        blacklist[badActor] = false;
+    }
+
+    function isAllowlisted(address actor) public view returns(bool) {
+        return allowlist[actor];
     }
 }

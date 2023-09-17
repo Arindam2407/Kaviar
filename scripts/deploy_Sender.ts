@@ -15,14 +15,13 @@ async function main() {
     const signer = wallet.connect(provider);
 
     const ETH_AMOUNT = ethers.utils.parseEther("0.001");
-    const AXELAR_GAS = ethers.utils.parseEther("0.03");
+    const AXELAR_GAS = ethers.utils.parseEther("0.009");
     
     const verifier = await new Sender__factory(signer).deploy(
         goerliNet.gateway,
         goerliNet.gasservice,
         AXELAR_GAS,
-        ETH_AMOUNT,
-        poseidonAddr
+        ETH_AMOUNT
     );
     await (verifier).deployed();
     console.log(`Sender contract deployed to ${verifier.address}`);

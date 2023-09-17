@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
-import { Receiver__factory, Blacklist__factory } from "../types";
+import { Receiver__factory } from "../types";
 import { bscNet, poseidonAddr, receiverBsc } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
@@ -22,11 +22,6 @@ async function main(){
     const relayerSigner = relayerSignerWallet.connect(provider);
     const userNewSignerWallet = new ethers.Wallet(process.env.userNewSigner ?? "");
     const userNewSigner = userNewSignerWallet.connect(provider);
-
-    const blacklist = await new Blacklist__factory(userOldSigner).deploy();
-
-    await (blacklist).deployed();
-    console.log(`Blacklist address: ${blacklist.address}`);
 
     const poseidon = await buildPoseidon();
 
@@ -48,16 +43,16 @@ async function main(){
     );
     
     const nullifier = new Uint8Array([
-        78, 191, 127, 137, 140,
-  195, 177, 206, 102, 131,
-  171, 254, 136, 202, 171
+        100,  22, 125, 214,  16,
+        112, 189, 102,  24, 213,
+        108, 119,  57,  52, 139
     ])
 
     const leafIndex = 0
     const leafIndexSubset = 0;
 
     const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
-    const commitment = "0x0cd45d40e40c4d685022a7d15754ab8b484be4ded7720d38a1c1bff3c5405201";
+    const commitment = "0x0963287f06dca891782be1bc0bf3c54af8d3022782f9188ac510270665e69cbd";
     
     await tree.insert(commitment);
     await SubsetTree.insert(commitment);
