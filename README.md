@@ -1,4 +1,4 @@
-# KeepSecret
+# Kaviar
 ## Cross-Chain Compliant Currency-Mixer
 
 ### Ethereum Singapore 2023 Hackathon
