@@ -2,8 +2,8 @@ import * as dotenv from "dotenv";
 // import { ethers } from "ethers";
 import {ethers} from "hardhat";
 //@ts-ignore
-import {poseidonContract, buildPoseidon } from "circomlibjs";
-import {Sender__factory, MerkleTreeSubset__factory} from "../types";
+import { buildPoseidon } from "circomlibjs";
+import { Sender__factory } from "../types";
 import {senderAddr, MTSBsc, bscNet, goerliNet, receiverBsc} from "../const";
 
 dotenv.config();
@@ -63,22 +63,9 @@ class Deposit {
     get commitment() {
         return poseidonHash(this.poseidon, [this.nullifier, 0]);
     }
-    // get hash f nullifierhash (nulifier+1+index)
-    get nullifierHash() {
-        if (!this.leafIndex && this.leafIndex !== 0)
-            throw Error("leafIndex is unset yet");
-        return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
-    }
 }
-
-function getPoseidonFactory(nInputs: number) {
-    const bytecode = poseidonContract.createCode(nInputs);
-    const abiJson = poseidonContract.generateABI(nInputs);
-    const abi = new ethers.utils.Interface(abiJson);
-    return new ethers.ContractFactory(abi, bytecode);
-  }
 
 main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
-  })
+})

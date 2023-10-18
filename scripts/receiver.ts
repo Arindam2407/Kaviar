@@ -3,7 +3,7 @@ import { BigNumber, BigNumberish } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import { Receiver__factory } from "../types";
-import { bscNet, poseidonAddr, receiverBsc } from "../const";
+import { bscNet, receiverBsc } from "../const";
 // @ts-ignore
 import { MerkleTree, Hasher } from "../src/merkleTree";
 // @ts-ignore
@@ -27,6 +27,23 @@ async function main(){
 
     const receiverContract = new Receiver__factory(userOldSigner).attach(ethers.utils.getAddress(receiverBsc));
 
+    const recipient = await userNewSigner.getAddress();
+    const relayer = await relayerSigner.getAddress();
+    const fee = 0;
+
+    const leafIndex = 0
+    const leafIndexSubset = 0;
+
+    const nullifier = new Uint8Array([
+        100,  22, 125, 214,  16,
+        112, 189, 102,  24, 213,
+        108, 119,  57,  52, 139
+    ])
+
+    const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
+    const commitment = "0x0963287f06dca891782be1bc0bf3c54af8d3022782f9188ac510270665e69cbd";
+
+    // tree implementations
     const HEIGHT = 20;
 
     console.log("pass 1");
@@ -42,27 +59,10 @@ async function main(){
         new PoseidonHasher(poseidon)
     );
     
-    const nullifier = new Uint8Array([
-        100,  22, 125, 214,  16,
-        112, 189, 102,  24, 213,
-        108, 119,  57,  52, 139
-    ])
-
-    const leafIndex = 0
-    const leafIndexSubset = 0;
-
-    const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
-    const commitment = "0x0963287f06dca891782be1bc0bf3c54af8d3022782f9188ac510270665e69cbd";
-    
     await tree.insert(commitment);
     await SubsetTree.insert(commitment);
 
-    const recipient = await userNewSigner.getAddress();
-    const relayer = await relayerSigner.getAddress();
-    const fee = 0;
-
     const { root, path_elements, path_index } = await tree.path(leafIndex);
-
     const { root: subsetRoot, path_elements: path_elements_subset, path_index: path_index_subset } = await SubsetTree.path(leafIndexSubset);
     
     const witness = {
@@ -136,32 +136,6 @@ async function prove(witness: any): Promise<Proof> {
         c: [proof.pi_c[0], proof.pi_c[1]],
     };
     return solProof;
-}
-
-class Deposit {
-    public constructor(
-        public readonly nullifier: Uint8Array,
-        public poseidon: any,
-        public leafIndex?: number
-    ) {
-        this.poseidon = poseidon;
-    }
-    static new(poseidon: any) {
-        // random nullifier (private note)
-        // here we only have private nullifier 
-        const nullifier = ethers.utils.randomBytes(15);
-        return new this(nullifier, poseidon);
-    }
-    // get hash of secret (nullifier)
-    get commitment() {
-        return poseidonHash(this.poseidon, [this.nullifier, 0]);
-    }
-    // get hash f nullifierhash (nulifier+1+index)
-    get nullifierHash() {
-        if (!this.leafIndex && this.leafIndex !== 0)
-            throw Error("leafIndex is unset yet");
-        return poseidonHash(this.poseidon, [this.nullifier, 1, this.leafIndex]);
-    }
 }
 
 main().catch((error) => {
