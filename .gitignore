@@ -3,5 +3,6 @@ cache/
 node_modules/
 types/
 
-
+TODO.txt
+deploy_rs/target/
 .env

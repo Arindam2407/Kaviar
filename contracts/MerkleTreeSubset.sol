@@ -2,10 +2,9 @@
 pragma solidity ^0.8.10;
 
 interface HasherSubset {
-    function poseidon(bytes32[2] calldata leftRight)
-        external
-        pure
-        returns (bytes32);
+    function poseidon(
+        bytes32[2] calldata leftRight
+    ) external pure returns (bytes32);
 }
 
 contract MerkleTreeSubset {
@@ -34,7 +33,7 @@ contract MerkleTreeSubset {
     mapping(address => bool) public blacklist;
     mapping(address => bool) public allowlist;
 
-    modifier isOwnable {
+    modifier isOwnable() {
         require(msg.sender == owner, "Not the owner");
         _;
     }
@@ -49,22 +48,27 @@ contract MerkleTreeSubset {
         filledSubtreesSubset.push(currentZeroSubset);
 
         for (uint32 i = 1; i < levelsSubset; i++) {
-            currentZeroSubset = hashLeftRightSubset(currentZeroSubset, currentZeroSubset);
+            currentZeroSubset = hashLeftRightSubset(
+                currentZeroSubset,
+                currentZeroSubset
+            );
             zerosSubset.push(currentZeroSubset);
             filledSubtreesSubset.push(currentZeroSubset);
         }
 
-        rootsSubset[0] = hashLeftRightSubset(currentZeroSubset, currentZeroSubset);
+        rootsSubset[0] = hashLeftRightSubset(
+            currentZeroSubset,
+            currentZeroSubset
+        );
     }
 
     /**
     @dev Hash 2 tree leaves, returns MiMC(_left, _right)
   */
-    function hashLeftRightSubset(bytes32 _left, bytes32 _right)
-        public
-        view
-        returns (bytes32)
-    {
+    function hashLeftRightSubset(
+        bytes32 _left,
+        bytes32 _right
+    ) public view returns (bytes32) {
         require(
             uint256(_left) < FIELD_SIZE_SUBSET,
             "_left should be inside the field"
@@ -99,10 +103,20 @@ contract MerkleTreeSubset {
         return false;
     }
 
-    function _insertSubset(bytes32 _leafSubset) public returns (uint32 index) {
+    function _insertSubset(
+        bytes32 _leafSubset
+    )
+        public
+        returns (
+            uint32 index,
+            bytes32 rootSubset,
+            bytes32[20] memory pathElementsSubset,
+            uint8[20] memory pathIndicesSubset
+        )
+    {
         uint32 currentIndexSubset = nextIndexSubset;
         require(
-            currentIndexSubset != uint32(2)**levelsSubset,
+            currentIndexSubset != uint32(2) ** levelsSubset,
             "Merkle tree is full. No more leafs can be added"
         );
         nextIndexSubset += 1;
@@ -116,9 +130,14 @@ contract MerkleTreeSubset {
                 right = zerosSubset[i];
 
                 filledSubtreesSubset[i] = currentLevelHashSubset;
+                pathElementsSubset[i] = zerosSubset[i];
+                pathIndicesSubset[i] = 0;
             } else {
                 left = filledSubtreesSubset[i];
                 right = currentLevelHashSubset;
+
+                pathElementsSubset[i] = filledSubtreesSubset[i];
+                pathIndicesSubset[i] = 1;
             }
 
             currentLevelHashSubset = hashLeftRightSubset(left, right);
@@ -126,37 +145,44 @@ contract MerkleTreeSubset {
             currentIndexSubset /= 2;
         }
 
-        currentRootIndexSubset = (currentRootIndexSubset + 1) % ROOT_HISTORY_SIZE_SUBSET;
+        currentRootIndexSubset =
+            (currentRootIndexSubset + 1) %
+            ROOT_HISTORY_SIZE_SUBSET;
         rootsSubset[currentRootIndexSubset] = currentLevelHashSubset;
         emit RootAddedSubset(currentRootIndexSubset, currentLevelHashSubset);
-        return nextIndexSubset - 1;
+        return (
+            nextIndexSubset - 1,
+            currentLevelHashSubset,
+            pathElementsSubset,
+            pathIndicesSubset
+        );
     }
 
     function blacklistAddress(address badActor) public isOwnable {
-        require(!(isBlacklisted(badActor)),"Address already blacklisted");
+        require(!(isBlacklisted(badActor)), "Address already blacklisted");
         blacklist[badActor] = true;
     }
 
     function unBlacklistAddress(address goodActor) public isOwnable {
-        require(isBlacklisted(goodActor),"Address not blacklisted");
+        require(isBlacklisted(goodActor), "Address not blacklisted");
         blacklist[goodActor] = false;
     }
 
-    function isBlacklisted(address actor) public view returns(bool) {
+    function isBlacklisted(address actor) public view returns (bool) {
         return blacklist[actor];
     }
 
     function allowlistAddress(address goodActor) public isOwnable {
-        require(!(isAllowlisted(goodActor)),"Address already allowed");
+        require(!(isAllowlisted(goodActor)), "Address already allowed");
         blacklist[goodActor] = true;
     }
 
     function unAllowlistAddress(address badActor) public isOwnable {
-        require(isAllowlisted(badActor),"Address not allowed");
+        require(isAllowlisted(badActor), "Address not allowed");
         blacklist[badActor] = false;
     }
 
-    function isAllowlisted(address actor) public view returns(bool) {
+    function isAllowlisted(address actor) public view returns (bool) {
         return allowlist[actor];
     }
 }

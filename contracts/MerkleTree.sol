@@ -2,10 +2,9 @@
 pragma solidity ^0.8.10;
 
 interface Hasher {
-    function poseidon(bytes32[2] calldata leftRight)
-        external
-        pure
-        returns (bytes32);
+    function poseidon(
+        bytes32[2] calldata leftRight
+    ) external pure returns (bytes32);
 }
 
 contract MerkleTree {
@@ -19,7 +18,7 @@ contract MerkleTree {
     uint32 public immutable levels = 20;
 
     // the following variables are made public for easier testing and debugging and
-   // are not supposed to be accessed in regular code
+    // are not supposed to be accessed in regular code
     bytes32[] public filledSubtrees;
     bytes32[] public zeros;
     uint32 public currentRootIndex = 0;
@@ -48,11 +47,10 @@ contract MerkleTree {
     /**
     @dev Hash 2 tree leaves, returns MiMC(_left, _right)
   */
-    function hashLeftRight(bytes32 _left, bytes32 _right)
-        public
-        view
-        returns (bytes32)
-    {
+    function hashLeftRight(
+        bytes32 _left,
+        bytes32 _right
+    ) public view returns (bytes32) {
         require(
             uint256(_left) < FIELD_SIZE,
             "_left should be inside the field"
@@ -87,12 +85,23 @@ contract MerkleTree {
         return false;
     }
 
-    function _insert(bytes32 _leaf) internal returns (uint32 index) {
+    function _insert(
+        bytes32 _leaf
+    )
+        internal
+        returns (
+            uint32 index,
+            bytes32 root,
+            bytes32[20] memory pathElements,
+            uint8[20] memory pathIndices
+        )
+    {
         uint32 currentIndex = nextIndex;
         require(
-            currentIndex != uint32(2)**levels,
+            currentIndex != uint32(2) ** levels,
             "Merkle tree is full. No more leafs can be added"
         );
+
         nextIndex += 1;
         bytes32 currentLevelHash = _leaf;
         bytes32 left;
@@ -104,9 +113,14 @@ contract MerkleTree {
                 right = zeros[i];
 
                 filledSubtrees[i] = currentLevelHash;
+                pathElements[i] = zeros[i];
+                pathIndices[i] = 0;
             } else {
                 left = filledSubtrees[i];
                 right = currentLevelHash;
+
+                pathElements[i] = filledSubtrees[i];
+                pathIndices[i] = 1;
             }
 
             currentLevelHash = hashLeftRight(left, right);
@@ -117,6 +131,6 @@ contract MerkleTree {
         currentRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE;
         roots[currentRootIndex] = currentLevelHash;
         emit RootAdded(currentRootIndex, currentLevelHash);
-        return nextIndex - 1;
+        return (nextIndex - 1, currentLevelHash, pathElements, pathIndices);
     }
 }
