@@ -11,6 +11,15 @@ The paper introduces a novel concept termed 'Privacy Pools'. The idea behind Pri
 Blacklists: restricting certain blacklisted addresses from depositing in the respective subset merkle tree associated with the list.
 Allowlists: only allowing certain whitelisted addresses to deposit in the respective subset merkle tree associated with the list.
 
+## Getting started
+
+Run the following code to get started: 
+
+```
+npm run build
+```
+
+The command will compile the circuits and the smart contracts
 
 ## Deposit
 
