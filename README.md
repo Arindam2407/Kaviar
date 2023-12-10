@@ -86,6 +86,8 @@ To Unallowlist Address:
 npm run unallowlist
 ```
 
+## Hashing
+
 We use Poseidon Hash for tree hashing, nullifier hashing, and commitment construction
 
 ```
