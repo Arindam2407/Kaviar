@@ -52,6 +52,6 @@ const mantleNet = {
   chainId: 5001,
   explorer: "https://testnet.mantlescan.org/tx/",
   poseidon: "0x52EE8690474938F6fEeB75EAb252f805873c11E1",
-  verifier: "0x8927234b9251871A39361d1e33a605B33e0Bd32a",
-  kaviar: "0x1c30b51fbF2C29a6d674cc1391ce3F9361814346",
+  verifier: "0xAeD32c0b6B734336BfAB72071A8Ad5F069EF7F4F",
+  kaviar: "0xb274d715eD676e753E034bb4FD94fb6A66F03134",
 };

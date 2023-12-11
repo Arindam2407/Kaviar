@@ -110,8 +110,7 @@ contract MerkleTreeSubset {
         returns (
             uint32 index,
             bytes32 rootSubset,
-            bytes32[20] memory pathElementsSubset,
-            uint8[20] memory pathIndicesSubset
+            bytes32[20] memory pathElementsSubset
         )
     {
         uint32 currentIndexSubset = nextIndexSubset;
@@ -131,13 +130,11 @@ contract MerkleTreeSubset {
 
                 filledSubtreesSubset[i] = currentLevelHashSubset;
                 pathElementsSubset[i] = zerosSubset[i];
-                pathIndicesSubset[i] = 0;
             } else {
                 left = filledSubtreesSubset[i];
                 right = currentLevelHashSubset;
 
                 pathElementsSubset[i] = filledSubtreesSubset[i];
-                pathIndicesSubset[i] = 1;
             }
 
             currentLevelHashSubset = hashLeftRightSubset(left, right);
@@ -153,8 +150,7 @@ contract MerkleTreeSubset {
         return (
             nextIndexSubset - 1,
             currentLevelHashSubset,
-            pathElementsSubset,
-            pathIndicesSubset
+            pathElementsSubset
         );
     }
 

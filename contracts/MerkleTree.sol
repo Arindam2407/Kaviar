@@ -92,8 +92,7 @@ contract MerkleTree {
         returns (
             uint32 index,
             bytes32 root,
-            bytes32[20] memory pathElements,
-            uint8[20] memory pathIndices
+            bytes32[20] memory pathElements
         )
     {
         uint32 currentIndex = nextIndex;
@@ -114,13 +113,11 @@ contract MerkleTree {
 
                 filledSubtrees[i] = currentLevelHash;
                 pathElements[i] = zeros[i];
-                pathIndices[i] = 0;
             } else {
                 left = filledSubtrees[i];
                 right = currentLevelHash;
 
                 pathElements[i] = filledSubtrees[i];
-                pathIndices[i] = 1;
             }
 
             currentLevelHash = hashLeftRight(left, right);
@@ -131,6 +128,6 @@ contract MerkleTree {
         currentRootIndex = (currentRootIndex + 1) % ROOT_HISTORY_SIZE;
         roots[currentRootIndex] = currentLevelHash;
         emit RootAdded(currentRootIndex, currentLevelHash);
-        return (nextIndex - 1, currentLevelHash, pathElements, pathIndices);
+        return (nextIndex - 1, currentLevelHash, pathElements);
     }
 }
