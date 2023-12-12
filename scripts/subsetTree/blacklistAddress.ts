@@ -75,7 +75,7 @@ async function run(
 
   const _ = await tx.wait();
   console.log(
-    `Address ${address_to_blacklist} blacklisted successfully! on ${mts_address}`
+    `Address ${address_to_blacklist} blacklisted successfully on ${mts_address}!`
   );
 }
 
