@@ -129,14 +129,13 @@ main().catch((error) => {
   process.exitCode = 1;
 });
 
-
 function num_to_rev_bin(n: number) {
   const binaryString = n.toString(2);
-  const reversedBinary = binaryString.split('').reverse().join('');
-  const stringArray = Array.from({ length: 20 }, () => '0');
-  const reversedBinaryArray = reversedBinary.split('');
+  const reversedBinary = binaryString.split("").reverse().join("");
+  const stringArray = Array.from({ length: 20 }, () => "0");
+  const reversedBinaryArray = reversedBinary.split("");
   for (let i = 0; i < reversedBinaryArray.length; i++) {
-      stringArray[i] = reversedBinaryArray[i]; 
+    stringArray[i] = reversedBinaryArray[i];
   }
   return stringArray;
 }

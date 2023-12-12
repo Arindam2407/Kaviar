@@ -13,7 +13,7 @@ Allowlists: only allowing certain whitelisted addresses to deposit in the respec
 
 ## Getting started
 
-Run the following code to get started: 
+Run the following code to get started:
 
 ```
 npm run build
@@ -31,16 +31,15 @@ Enter the following code:
 npm run deposit
 ```
 
-After this, you will be prompted to 
+After this, you will be prompted to
 
 Enter Chain :
 
 Currently supported chains are 'GOERLI', 'BSC' and 'MANTLE' (Testnets),
 
-Enter Subset Tree Address : 
+Enter Subset Tree Address :
 
 Enter address of the subset merkle tree
-
 
 ## Withdraw
 
@@ -52,7 +51,6 @@ npm run withdraw
 
 Pass in the deposit string when prompted
 
-
 ## Subset Tree
 
 From the perspective of a regulatory authority, they can, like any other group/body of people, deploy their own subset merkle tree contract through Kaviar and freely blacklist/allowlist addresses. They can publish the contract address on the internet so that people willing to make compliant private payments can pass in this address to achieve their objectives. The regulatory authority can easily see which people are transacting through their sub-pool.
@@ -61,9 +59,9 @@ From the perspective of a regulatory authority, they can, like any other group/b
 npm run deploy_subset
 ```
 
-Again, you will be prompted to 
+Again, you will be prompted to
 
-Enter Chain: 
+Enter Chain:
 
 To perform functions on the deployed subset tree, the authority/body will need to pass in the name of the supported chain, address of their subset tree contract address and the address they wish to modify privileges of. There are four possible subset tree functions, of which any subset tree allows only two depending on its status:
 

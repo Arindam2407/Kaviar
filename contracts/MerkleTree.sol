@@ -89,11 +89,7 @@ contract MerkleTree {
         bytes32 _leaf
     )
         internal
-        returns (
-            uint32 index,
-            bytes32 root,
-            bytes32[20] memory pathElements
-        )
+        returns (uint32 index, bytes32 root, bytes32[20] memory pathElements)
     {
         uint32 currentIndex = nextIndex;
         require(

@@ -3,5 +3,4 @@ cache/
 node_modules/
 types/
 
-TODO.txt
 .env

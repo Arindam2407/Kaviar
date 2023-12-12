@@ -15,24 +15,33 @@ async function main() {
   });
   readline.question(`Enter Chain: `, (chain_name: string) => {
     let chain = chain_name;
-    try {
-      if (chain == "") {
-        throw new Error("Chain must be set");
+    readline.question(
+      `The Subset Tree is a Blacklist (true/false) : `,
+      (tree_status: string) => {
+        let status = true; //default
+        status = Boolean(tree_status);
+        try {
+          if (chain == "") {
+            throw new Error("Chain must be set");
+          }
+          if (!chains.includes(chain)) {
+            throw new Error(
+              "Chain could not be parsed because of invalid name"
+            );
+          }
+        } catch (e) {
+          console.log(e);
+          readline.close();
+          return;
+        }
+        run(chain, status);
+        readline.close();
       }
-      if (!chains.includes(chain)) {
-        throw new Error("Chain could not be parsed because of invalid name");
-      }
-    } catch (e) {
-      console.log(e);
-      readline.close();
-      return;
-    }
-    run(chain);
-    readline.close();
+    );
   });
 }
 
-async function run(chain: string) {
+async function run(chain: string, status: boolean) {
   const wallet = new ethers.Wallet(process.env.userOldSigner ?? "");
 
   const provider = parse_chain_provider(chain);
@@ -43,7 +52,7 @@ async function run(chain: string) {
 
   const merkleTreeSubset = await new MerkleTreeSubset__factory(signer).deploy(
     parse_chain_params(chain).poseidon,
-    true,
+    status,
     { gasLimit: 10000000 }
   );
   await merkleTreeSubset.deployed();
