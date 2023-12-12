@@ -16,10 +16,10 @@ Allowlists: only allowing certain whitelisted addresses to deposit in the respec
 Run the following code to get started:
 
 ```
-npm run build
+npm run compile
 ```
 
-The command will compile the circuits and the smart contracts
+The command will compile the smart contracts
 
 ## Deposit
 
