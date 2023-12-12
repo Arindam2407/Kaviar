@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "npm run setup && npm run compile",
     "compile": "hardhat compile && typechain --out-dir types --target ethers-v5 './artifacts/contracts/**/!(*.dbg).json'",
-    "setup": "sh quickSetup.sh",
     "deploy_subset": "cargo run deploy_subset",
     "blacklist": "cargo run blacklist",
     "unblacklist": "cargo run unblacklist",

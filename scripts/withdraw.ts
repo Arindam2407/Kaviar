@@ -121,7 +121,6 @@ async function run(deposit_string: string) {
       receiptWithdraw.transactionHash
     }`
   );
-  process.exit();
 }
 
 main().catch((error) => {
