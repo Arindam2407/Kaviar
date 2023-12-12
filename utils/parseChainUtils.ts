@@ -38,20 +38,20 @@ const goerliNet = {
   chainId: 5,
   explorer: "https://goerli.etherscan.io/tx/",
   poseidon: "0xE8eddE68F249fA99AD369EbD0053961518607F6a",
-  verifier: "0x3632F5C76b0Dfe3E2771A8bFcEfBD75Bc2DBeB23",
-  kaviar: "0xc3B8d3E63Bc2D76Fb13Fd6E547A15a58Cc30D115",
+  verifier: "0xfb3b532c1350269ad23c1f530daa868ce6b156c8",
+  kaviar: "0x21ed3af2d38d66b6b955d7108dcddf54317e5c6a",
 };
 const bscNet = {
   chainId: 97,
   explorer: "https://testnet.bscscan.com/tx/",
   poseidon: "0x056a41D3673F3d0C6d3440DB9408F4f78Dd4aFb3",
-  verifier: "0x11b876122B7a64A746F8453C5E025b38521F85C6",
-  kaviar: "0x40C8d21aAeB68a27750A0e707a8833fcbE4fEE76",
+  verifier: "0x02515b7ecd58eb3d1d51c7b2ed7490703b5c027f",
+  kaviar: "0x8670db125e625ae52af9fe3a15376f797ab7c8e5",
 };
 const mantleNet = {
   chainId: 5001,
   explorer: "https://testnet.mantlescan.org/tx/",
   poseidon: "0x52EE8690474938F6fEeB75EAb252f805873c11E1",
-  verifier: "0x491d3b40Cf1810BD2Af43E25695406c904338F3B",
-  kaviar: "0x3DF64cA9bD5d6fb011d88e84412770AF08BD4393",
+  verifier: "0xf3e5ca550540b6149d02fff953920e10f1bb13f2",
+  kaviar: "0xda626e57906c945cdc4a58f0a805bc9fe51800bb",
 };

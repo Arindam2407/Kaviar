@@ -60,7 +60,7 @@ async function run(chain: string, mts_address: string) {
   const kaviarContract = new Kaviar__factory(signer).attach(
     parse_chain_params(chain).kaviar
   );
-  const TOTAL_VALUE = ethers.utils.parseEther("0.0001");
+  const TOTAL_VALUE = ethers.utils.parseEther("0.01");
 
   const tx = await kaviarContract
     .connect(signer)
@@ -78,7 +78,7 @@ async function run(chain: string, mts_address: string) {
     timestamp: receipt.blockNumber,
   };
 
-  console.log(`\nDeposit of 0.0001 ETH sent successfully! \n`);
+  console.log(`\nDeposit of 0.01 ETH sent successfully! \n`);
   console.log(
     `View this transaction on ${parse_chain_params(chain).explorer}${
       receipt.transactionHash

@@ -49,7 +49,7 @@ async function run(chain: string) {
     `Verifier.sol has been deployed to ${verifier.address} on ${chain}\n`
   );
 
-  const ETH_AMOUNT = ethers.utils.parseEther("0.0001");
+  const ETH_AMOUNT = ethers.utils.parseEther("0.01");
 
   // deploy KAVIAR on chain
   console.log(`Deploying contract Kaviar.sol on ${chain}\n`);
