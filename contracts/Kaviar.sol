@@ -31,20 +31,18 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
 
     event Deposit(
         bytes32 indexed commitment,
-        uint32 leafIndex,
+        uint32 insertedIndex,
         bytes32 root,
         bytes32[20] pathElements,
-        uint8[20] pathIndices,
         uint256 timestamp
     );
 
     event SubsetDeposit(
         bytes32 indexed commitment,
         address subsetAddress,
-        uint32 leafIndex,
+        uint32 insertedIndexSubset,
         bytes32 root,
         bytes32[20] pathElements,
-        uint8[20] pathIndices,
         uint256 timestamp
     );
 
@@ -79,8 +77,7 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
         (
             uint32 insertedIndex,
             bytes32 root,
-            bytes32[20] memory pathElements,
-            uint8[20] memory pathIndices
+            bytes32[20] memory pathElements
         ) = _insert(commitment);
 
         MerkleTreeSubset subset_tree = MerkleTreeSubset(subsetTreeAddress);
@@ -91,8 +88,7 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
             (
                 uint32 insertedIndexSubset,
                 bytes32 rootSubset,
-                bytes32[20] memory pathElementsSubset,
-                uint8[20] memory pathIndicesSubset
+                bytes32[20] memory pathElementsSubset
             ) = subset_tree._insertSubset(commitment);
 
             emit SubsetDeposit(
@@ -101,7 +97,6 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
                 insertedIndexSubset,
                 rootSubset,
                 pathElementsSubset,
-                pathIndicesSubset,
                 block.timestamp
             );
         } else if (
@@ -110,8 +105,7 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
             (
                 uint32 insertedIndexSubset,
                 bytes32 rootSubset,
-                bytes32[20] memory pathElementsSubset,
-                uint8[20] memory pathIndicesSubset
+                bytes32[20] memory pathElementsSubset
             ) = subset_tree._insertSubset(commitment);
 
             emit SubsetDeposit(
@@ -120,7 +114,6 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
                 insertedIndexSubset,
                 rootSubset,
                 pathElementsSubset,
-                pathIndicesSubset,
                 block.timestamp
             );
         }
@@ -130,7 +123,6 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
             insertedIndex,
             root,
             pathElements,
-            pathIndices,
             block.timestamp
         );
     }

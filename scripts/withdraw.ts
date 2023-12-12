@@ -1,5 +1,4 @@
-import { ethers } from "hardhat";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import { Kaviar__factory } from "../types";
@@ -66,16 +65,17 @@ async function run(deposit_string: string) {
 
   let SubsetDepositEvent = eventsSubset[0].args;
 
-  let leafIndex = DepositEvent[1];
+  let insertedIndex = DepositEvent[1];
   let root = DepositEvent[2];
   let path_elements = DepositEvent[3];
-  let path_indices = DepositEvent[4];
+  let path_indices = num_to_rev_bin(insertedIndex);
 
+  let insertedIndexSubset = SubsetDepositEvent[2];
   let subsetRoot = SubsetDepositEvent[3];
   let path_elements_subset = SubsetDepositEvent[4];
-  let path_indices_subset = SubsetDepositEvent[5];
+  let path_indices_subset = num_to_rev_bin(insertedIndexSubset);
 
-  const nullifierHash = poseidonHash(poseidon, [nullifier, 1, leafIndex]);
+  const nullifierHash = poseidonHash(poseidon, [nullifier, 1, insertedIndex]);
   const recipient = await relayerSigner.getAddress();
   const relayer = await relayerSigner.getAddress();
   const fee = 0;
@@ -115,15 +115,27 @@ async function run(deposit_string: string) {
     );
 
   const receiptWithdraw = await txWithdraw.wait(1);
-  console.log(`ETH successfully withdrawn!\n`);
+  console.log(`Deposit successfully withdrawn!\n`);
   console.log(
     `View this transaction on ${parse_chain_params(chain).explorer}${
       receiptWithdraw.transactionHash
     }`
   );
+  process.exit();
 }
 
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+function num_to_rev_bin(n: number) {
+  const binaryString = n.toString(2);
+  const reversedBinary = binaryString.split("").reverse().join("");
+  const stringArray = Array.from({ length: 20 }, () => "0");
+  const reversedBinaryArray = reversedBinary.split("");
+  for (let i = 0; i < reversedBinaryArray.length; i++) {
+    stringArray[i] = reversedBinaryArray[i];
+  }
+  return stringArray;
+}

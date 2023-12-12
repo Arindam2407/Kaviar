@@ -1,5 +1,4 @@
-import { ethers } from "hardhat";
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 //@ts-ignore
 import { groth16 } from "snarkjs";
 import path from "path";

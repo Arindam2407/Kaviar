@@ -526,20 +526,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
 
 [[package]]
-name = "deploy_rs"
-version = "0.1.0"
-dependencies = [
- "dotenv",
- "ethers",
- "ethers-solc 1.0.2",
- "eyre",
- "serde",
- "serde_json",
- "thiserror",
- "tokio",
-]
-
-[[package]]
 name = "der"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1754,6 +1740,21 @@ dependencies = [
  "once_cell",
  "sha2",
  "signature 2.2.0",
+]
+
+[[package]]
+name = "kaviar"
+version = "1.0.0"
+dependencies = [
+ "base64 0.13.1",
+ "dotenv",
+ "ethers",
+ "ethers-solc 1.0.2",
+ "eyre",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
 ]
 
 [[package]]
