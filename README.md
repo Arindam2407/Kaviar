@@ -1,5 +1,7 @@
 # Kaviar
 
+## [Click here for the full TypeScript Implementation](https://github.com/Arindam2407/Kaviar/tree/typescript)
+
 ## Regulatory-compliant Currency Mixer
 
 Kaviar is a zero-knowledge protocol enabling regulatory-compliant private payments on EVM-based blockchains.
