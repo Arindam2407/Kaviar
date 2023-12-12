@@ -7,7 +7,7 @@ async function main() {
     input: process.stdin,
     output: process.stdout,
   });
-  readline.question("Enter Chain : ", (chain_name: string) => {
+  readline.question("Enter Chain : \n", (chain_name: string) => {
     let chain = chain_name;
     try {
       if (chain == "") {
@@ -21,35 +21,38 @@ async function main() {
       readline.close();
       return;
     }
-    readline.question("Enter Subset Tree Address : ", (MTS_address: string) => {
-      let mts_address = MTS_address;
-      try {
-        if (mts_address == "") {
-          throw new Error("Subset Tree Address must be set");
-        }
-      } catch (e) {
-        console.log(e);
-        readline.close();
-        return;
-      }
-      readline.question(
-        "Enter Address to Blacklist: ",
-        (address_blacklist: string) => {
-          let address_to_blacklist = address_blacklist;
-          try {
-            if (address_to_blacklist == "") {
-              throw new Error("Address to Blacklist must be set");
-            }
-          } catch (e) {
-            console.log(e);
-            readline.close();
-            return;
+    readline.question(
+      "Enter Subset Tree Address : \n",
+      (MTS_address: string) => {
+        let mts_address = MTS_address;
+        try {
+          if (mts_address == "") {
+            throw new Error("Subset Tree Address must be set");
           }
-          run(chain, mts_address, address_to_blacklist);
+        } catch (e) {
+          console.log(e);
           readline.close();
+          return;
         }
-      );
-    });
+        readline.question(
+          "Enter Address to Blacklist: \n",
+          (address_blacklist: string) => {
+            let address_to_blacklist = address_blacklist;
+            try {
+              if (address_to_blacklist == "") {
+                throw new Error("Address to Blacklist must be set");
+              }
+            } catch (e) {
+              console.log(e);
+              readline.close();
+              return;
+            }
+            run(chain, mts_address, address_to_blacklist);
+            readline.close();
+          }
+        );
+      }
+    );
   });
 }
 

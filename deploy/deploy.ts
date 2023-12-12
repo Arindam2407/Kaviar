@@ -11,7 +11,7 @@ async function main() {
     input: process.stdin,
     output: process.stdout,
   });
-  readline.question("Enter Chain : ", (chain_name: string) => {
+  readline.question("Enter Chain : \n", (chain_name: string) => {
     let chain = chain_name;
 
     try {

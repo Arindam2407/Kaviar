@@ -14,9 +14,9 @@ async function main() {
     input: process.stdin,
     output: process.stdout,
   });
-  readline.question("Enter Chain : ", (chain_name: string) => {
+  readline.question("Enter Chain : \n", (chain_name: string) => {
     let chain = chain_name;
-    readline.question("Enter Subset Tree Address: ", (address: string) => {
+    readline.question("Enter Subset Tree Address: \n", (address: string) => {
       let mts_address = address;
       try {
         if (mts_address == "") {

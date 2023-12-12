@@ -1,5 +1,4 @@
-import { ethers } from "hardhat";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 //@ts-ignore
 import { buildPoseidon } from "circomlibjs";
 import { Kaviar__factory } from "../types";
@@ -116,7 +115,7 @@ async function run(deposit_string: string) {
     );
 
   const receiptWithdraw = await txWithdraw.wait(1);
-  console.log(`ETH successfully withdrawn!\n`);
+  console.log(`Deposit successfully withdrawn!\n`);
   console.log(
     `View this transaction on ${parse_chain_params(chain).explorer}${
       receiptWithdraw.transactionHash

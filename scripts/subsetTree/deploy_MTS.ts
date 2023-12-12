@@ -13,10 +13,10 @@ async function main() {
     input: process.stdin,
     output: process.stdout,
   });
-  readline.question(`Enter Chain: `, (chain_name: string) => {
+  readline.question(`Enter Chain: \n`, (chain_name: string) => {
     let chain = chain_name;
     readline.question(
-      `The Subset Tree is a Blacklist (true/false) : `,
+      `The Subset Tree is a Blacklist (true/false) : \n`,
       (tree_status: string) => {
         let status = true; //default
         status = Boolean(tree_status);
