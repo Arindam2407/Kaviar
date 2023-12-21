@@ -18,6 +18,7 @@ Allowlists: only allowing certain whitelisted addresses to deposit in the respec
 Run the following code to get started:
 
 ```
+npm run install
 npm run compile
 ```
 
