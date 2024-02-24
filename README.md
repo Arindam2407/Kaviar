@@ -13,6 +13,16 @@ The paper introduces a novel concept termed 'Privacy Pools'. The idea behind Pri
 Blacklists: restricting certain blacklisted addresses from depositing in the respective subset merkle tree associated with the list.
 Allowlists: only allowing certain whitelisted addresses to deposit in the respective subset merkle tree associated with the list.
 
+## Getting Started with Kaviar Website
+
+Run the following code to get started:
+
+```
+npm install
+npm run compile
+npm run dev
+```
+
 ## Getting Started with Kaviar CLI
 
 Run the following code to get started:
