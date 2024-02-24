@@ -1,7 +1,5 @@
 # Kaviar
 
-## [Click here for the full TypeScript Implementation](https://github.com/Arindam2407/Kaviar/tree/typescript)
-
 ## [Click here for the video demo](https://www.loom.com/share/522fa8d066c5458a91316346945c6a09?sid=a2979a1b-48d0-4126-aeac-4522eaab7dbd)
 
 ## Regulatory-compliant Currency Mixer
@@ -98,11 +96,4 @@ To Unallowlist Address:
 npm run unallowlist
 ```
 
-## Hashing
-
-We use Poseidon Hash for tree hashing, nullifier hashing, and commitment construction
-
-```
-commitment = PoseidonHash(nullifier, 0)
-nullifierHash = PoseidonHash(nullifier, 1, leafIndex)
-```
+## [Click here for the full TypeScript Implementation](https://github.com/Arindam2407/Kaviar/tree/typescript)
