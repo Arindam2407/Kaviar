@@ -10,8 +10,8 @@ pub use chain_info::{parse_chain, ChainInfo};
 pub use deploy::deploy;
 pub use subset::{allowlist, blacklist, deploy_subset, unallowlist, unblacklist};
 
-abigen!(Verifier, "artifacts/contracts/Verifier.sol/Verifier.json",);
-abigen!(Kaviar, "artifacts/contracts/Kaviar.sol/Kaviar.json");
+abigen!(Verifier, "./artifacts/contracts/Verifier.sol/Verifier.json",);
+abigen!(Kaviar, "./artifacts/contracts/Kaviar.sol/Kaviar.json");
 
 pub enum Config {
     Deploy {

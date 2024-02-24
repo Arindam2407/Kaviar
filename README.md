@@ -2,6 +2,8 @@
 
 ## [Click here for the full TypeScript Implementation](https://github.com/Arindam2407/Kaviar/tree/typescript)
 
+## [Click here for the video demo](https://www.loom.com/share/522fa8d066c5458a91316346945c6a09?sid=a2979a1b-48d0-4126-aeac-4522eaab7dbd)
+
 ## Regulatory-compliant Currency Mixer
 
 Kaviar is a zero-knowledge protocol enabling regulatory-compliant private payments on EVM-based blockchains.
@@ -13,12 +15,12 @@ The paper introduces a novel concept termed 'Privacy Pools'. The idea behind Pri
 Blacklists: restricting certain blacklisted addresses from depositing in the respective subset merkle tree associated with the list.
 Allowlists: only allowing certain whitelisted addresses to deposit in the respective subset merkle tree associated with the list.
 
-## Getting started
+## Getting Started with Kaviar CLI
 
 Run the following code to get started:
 
 ```
-npm run install
+npm install
 npm run compile
 ```
 

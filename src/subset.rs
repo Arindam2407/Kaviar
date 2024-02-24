@@ -38,10 +38,7 @@ pub async fn deploy_subset(config: Config) -> Result<(), &'static str> {
                 .read_line(&mut is_blacklist)
                 .expect("Failed to read line");
 
-            let is_blacklist: bool = match is_blacklist.trim().parse() {
-                Ok(status) => status,
-                Err(_) => true, // default,
-            };
+            let is_blacklist: bool = is_blacklist.trim().parse().unwrap_or(true);
 
             let mts_contract = MerkleTreeSubset::deploy(client, (poseidon, is_blacklist))
                 .unwrap()

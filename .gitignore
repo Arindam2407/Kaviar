@@ -5,3 +5,38 @@ types/
 
 target/
 .env
+
+#frontend
+
+# dependencies
+/frontend/kaviar/.pnp
+/frontend/kaviar/.pnp.js
+
+# testing
+/frontend/kaviar/coverage
+
+# next.js
+/frontend/kaviar/.next/
+/frontend/kaviar/out/
+
+# production
+/frontend/kaviar/build
+
+# misc
+/frontend/kaviar/.DS_Store
+/frontend/kaviar/*.pem
+
+# debug
+/frontend/kaviar/npm-debug.log*
+/frontend/kaviar/yarn-debug.log*
+/frontend/kaviaryarn-error.log*
+
+# local env files
+/frontend/kaviar/.env*.local
+
+# vercel
+/frontend/kaviar/.vercel
+
+# typescript
+/frontend/kaviar/*.tsbuildinfo
+/frontend/kaviar/next-env.d.ts
