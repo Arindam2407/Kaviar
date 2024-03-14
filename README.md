@@ -15,12 +15,13 @@ Allowlists: only allowing certain whitelisted addresses to deposit in the respec
 
 ## Getting Started with Kaviar Website
 
-Run the following code to get started:
 
-First of all, please specify the environment variables to use the app:
+First of all, please specify the environment variables in the .env file to use the app:
 
 userOldSigner is the private key of the depositor,
 relayerSigner is the private key of the relayer/withdrawer
+
+Run the following code to get started:
 
 ```
 npm install
