@@ -3,9 +3,9 @@ import { HardhatUserConfig } from "hardhat/types";
 import dotenv from "dotenv";
 dotenv.config();
 
-const CONFLUX_URL = process.env.CONFLUX_URL;
-const BSC_TESTNET_URL = process.env.BSC_TESTNET_URL;
-const MANTLE_TESTNET_URL = process.env.MANTLE_TESTNET_URL;
+const CONFLUX_URL = "https://evmtestnet.confluxrpc.com";
+const BSC_TESTNET_URL = "https://bsc-dataseed.binance.org/"
+const MANTLE_TESTNET_URL = "https://rpc.testnet.mantle.xyz"
 const userOldSigner = process.env.userOldSigner;
 const relayerSigner = process.env.relayerSigner;
 
