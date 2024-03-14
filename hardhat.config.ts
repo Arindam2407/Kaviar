@@ -3,7 +3,7 @@ import { HardhatUserConfig } from "hardhat/types";
 import dotenv from "dotenv";
 dotenv.config();
 
-const GOERLI_URL = process.env.GOERLI_URL;
+const CONFLUX_URL = process.env.CONFLUX_URL;
 const BSC_TESTNET_URL = process.env.BSC_TESTNET_URL;
 const MANTLE_TESTNET_URL = process.env.MANTLE_TESTNET_URL;
 const userOldSigner = process.env.userOldSigner;
@@ -12,8 +12,8 @@ const relayerSigner = process.env.relayerSigner;
 const config: HardhatUserConfig = {
   networks: {
     hardhat: {},
-    goerli: {
-      url: GOERLI_URL,
+    conflux: {
+      url: CONFLUX_URL,
       accounts: [`${userOldSigner}`, `0x${relayerSigner}`],
       gas: 10000000,
       timeout: 60000,

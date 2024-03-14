@@ -1,12 +1,12 @@
 import { ethers } from "ethers";
 
-export const chains = ["GOERLI", "BSC", "MANTLE"];
+export const chains = ["CONFLUX", "BSC", "MANTLE"];
 
 export function parse_chain_provider(chain: string) {
-  if (chain == "GOERLI") {
+  if (chain == "CONFLUX") {
     const provider = new ethers.providers.StaticJsonRpcProvider(
-      process.env.GOERLI_URL,
-      goerliNet.chainId
+      process.env.CONFLUX_URL,
+      confluxNet.chainId
     );
     return provider;
   } else if (chain == "BSC") {
@@ -25,8 +25,8 @@ export function parse_chain_provider(chain: string) {
 }
 
 export function parse_chain_params(chain: string) {
-  if (chain == "GOERLI") {
-    return goerliNet;
+  if (chain == "CONFLUX") {
+    return confluxNet;
   } else if (chain == "BSC") {
     return bscNet;
   } else {
@@ -34,12 +34,12 @@ export function parse_chain_params(chain: string) {
   }
 }
 
-const goerliNet = {
-  chainId: 5,
-  explorer: "https://goerli.etherscan.io/tx/",
-  poseidon: "0xE8eddE68F249fA99AD369EbD0053961518607F6a",
-  verifier: "0xfb3b532c1350269ad23c1f530daa868ce6b156c8",
-  kaviar: "0x21ed3af2d38d66b6b955d7108dcddf54317e5c6a",
+const confluxNet = {
+  chainId: 71,
+  explorer: "https://evmtestnet.confluxscan.io/tx/",
+  poseidon: "0x86ECE5cfBeCeC21054fAC970141537aa57BE177d",
+  verifier: "0x5250381B50202A7498c198118F905a77733b58e4",
+  kaviar: "0xf4990684aCC25Ec2B4a10C228A44071F2fEa97e6",
 };
 const bscNet = {
   chainId: 97,

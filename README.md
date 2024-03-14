@@ -23,6 +23,8 @@ npm run compile
 npm run dev
 ```
 
+Sample subset tree address of Conflux eSpace Testnet: 0x9C9AA00704d458f1a46cdBbDA3abEb7964f248A2
+
 ## Getting Started with Kaviar CLI
 
 Run the following code to get started:
@@ -48,7 +50,7 @@ After this, you will be prompted to
 
 Enter Chain :
 
-Currently supported chains are 'GOERLI', 'BSC' and 'MANTLE' (Testnets),
+Currently supported chains are 'CONFLUX', 'BSC' and 'MANTLE' (Testnets),
 
 Enter Subset Tree Address :
 

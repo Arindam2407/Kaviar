@@ -18,7 +18,7 @@ const ButtonState = {Normal : 0, Loading : 1, Disabled : 2};
 const Interface = () => {
     const { enableWeb3, isWeb3Enabled, account, Moralis, deactivateWeb3, isWeb3EnableLoading } = useMoralis()
 
-    const [subsetAddressGOERLI, updateSubsetAddressGOERLI] = useState<HTMLInputElement | null>(null);
+    const [subsetAddressCONFLUX, updateSubsetAddressCONFLUX] = useState<HTMLInputElement | null>(null);
     const [subsetAddressBSC, updateSubsetAddressBSC] = useState<HTMLInputElement | null>(null);
     const [subsetAddressMANTLE, updateSubsetAddressMANTLE] = useState<HTMLInputElement | null>(null);
     const [textArea, updateTextArea] = useState<HTMLTextAreaElement | null>(null);
@@ -29,7 +29,7 @@ const Interface = () => {
     const [withdrawalSuccessful, updateWithdrawalSuccessful] = useState(false);
     const [displayCopiedMessage, updateDisplayCopiedMessage] = useState(false);
     const [metamaskButtonState, updateMetamaskButtonState] = useState(ButtonState.Normal);
-    const [depositButtonStateGOERLI, updateDepositButtonStateGOERLI] = useState(ButtonState.Normal);
+    const [depositButtonStateCONFLUX, updateDepositButtonStateCONFLUX] = useState(ButtonState.Normal);
     const [depositButtonStateBSC, updateDepositButtonStateBSC] = useState(ButtonState.Normal);
     const [depositButtonStateMANTLE, updateDepositButtonStateMANTLE] = useState(ButtonState.Normal);
     const [withdrawButtonState, updateWithdrawButtonState] = useState(ButtonState.Normal);
@@ -68,8 +68,8 @@ const Interface = () => {
 
             var chainId = (window as any).ethereum.networkVersion;
 
-            if(chainId != "5" && chainId != "97" && chainId != "5001"){
-                alert("Please switch to a supported chain (GOERLI / BINANCE SMART CHAIN / MANTLE TESTNET");
+            if(chainId != "71" && chainId != "97" && chainId != "5001"){
+                alert("Please switch to a supported chain (CONFLUX / BINANCE SMART CHAIN / MANTLE TESTNET");
                 throw "wrong-chain";
             }
 
@@ -114,9 +114,9 @@ const Interface = () => {
         return stringArray;
       }
 
-    const depositEtherGOERLI = async () => {
-        updateDepositButtonStateGOERLI(ButtonState.Disabled);
-        if(!subsetAddressGOERLI || !subsetAddressGOERLI.value) { alert("Please Input the Subset Tree/Privacy Pool Address"); } 
+    const depositEtherCONFLUX = async () => {
+        updateDepositButtonStateCONFLUX(ButtonState.Disabled);
+        if(!subsetAddressCONFLUX || !subsetAddressCONFLUX.value) { alert("Please Input the Subset Tree/Privacy Pool Address"); } 
         else {
             const ethereum = await (window as any).ethereum;
             const signer =new ethers.providers.Web3Provider(ethereum).getSigner();
@@ -126,13 +126,13 @@ const Interface = () => {
                 const deposit = Deposit.new(poseidon);
         
                 const kaviarContract = new Kaviar__factory(signer).attach(
-                parse_chain_params("GOERLI").kaviar
+                parse_chain_params("CONFLUX").kaviar
                 );
                 const TOTAL_VALUE = ethers.utils.parseEther("0.01");
             
                 const tx = await kaviarContract
                 .connect(signer)
-                .deposit(deposit.commitment, subsetAddressGOERLI.value, {
+                .deposit(deposit.commitment, subsetAddressCONFLUX.value, {
                     value: TOTAL_VALUE,
                     gasLimit: 10000000,
                 });
@@ -140,7 +140,7 @@ const Interface = () => {
                 const receipt = await tx.wait();
             
                 const depositElements = {
-                chain: "GOERLI",
+                chain: "CONFLUX",
                 nullifier: deposit.nullifier,
                 commitment: deposit.commitment,
                 timestamp: receipt.blockNumber,
@@ -148,7 +148,7 @@ const Interface = () => {
             
                 console.log(`\nDeposit of 0.01 ETH sent successfully! \n`);
                 console.log(
-                `View this transaction on ${parse_chain_params("GOERLI").explorer}${
+                `View this transaction on ${parse_chain_params("CONFLUX").explorer}${
                     receipt.transactionHash
                 }\n`
                 );
@@ -162,11 +162,11 @@ const Interface = () => {
                 console.log(error);
             }
         }
-        updateDepositButtonStateGOERLI(ButtonState.Normal);
+        updateDepositButtonStateCONFLUX(ButtonState.Normal);
     };
 
     const depositEtherBSC = async () => {
-        updateDepositButtonStateGOERLI(ButtonState.Disabled);
+        updateDepositButtonStateCONFLUX(ButtonState.Disabled);
         if(!subsetAddressBSC || !subsetAddressBSC.value) { alert("Please Input the Subset Tree/Privacy Pool Address"); } 
         else {
             const ethereum = await (window as any).ethereum;
@@ -455,12 +455,12 @@ const Interface = () => {
                                                 <div className="justify-between items-center">
                                                 <p className="text-secondary">Enter Subset Tree/Privacy Pool Address.</p>
                                                 <div className="form-group">
-                                                    <input className="form-control" style={{ resize: "none" }} ref={(ta) => { updateSubsetAddressGOERLI(ta); }}></input>
+                                                    <input className="form-control" style={{ resize: "none" }} ref={(ta) => { updateSubsetAddressCONFLUX(ta); }}></input>
                                                 <button 
                                                     className="btn btn-success" 
-                                                    onClick={depositEtherGOERLI}
-                                                    disabled={depositButtonStateGOERLI == ButtonState.Disabled}
-                                                ><span className="small">GOERLI TESTNET</span></button>
+                                                    onClick={depositEtherCONFLUX}
+                                                    disabled={depositButtonStateCONFLUX == ButtonState.Disabled}
+                                                ><span className="small">CONFLUX TESTNET</span></button>
                                                 </div>
                                                 <br/>
                                                 <div className="form-group">
