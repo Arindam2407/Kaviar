@@ -6,6 +6,7 @@ pragma experimental ABIEncoderV2;
 import "./MerkleTree.sol";
 import "./MerkleTreeSubset.sol";
 import "./Verifier.sol";
+import "./WETH.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 struct Proof {
@@ -24,6 +25,8 @@ interface IVerifier {
 }
 
 contract Kaviar is MerkleTree, ReentrancyGuard {
+    WETHToken public weth;
+
     uint256 public immutable denomination;
     IVerifier public immutable verifier;
 
@@ -61,6 +64,7 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
         require(_denomination > 0, "denomination should be greater than 0");
         verifier = _verifier;
         denomination = _denomination;
+        weth = new WETHToken("Wrapped ETH","WETH", address(this));
     }
 
     /**
@@ -170,8 +174,8 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
     }
 
     function _processWithdraw(
-        address _recipient,
-        address _relayer,
+        address  _recipient,
+        address  _relayer,
         uint256 _fee
     ) internal {
         // sanity checks
@@ -179,10 +183,10 @@ contract Kaviar is MerkleTree, ReentrancyGuard {
             msg.value == 0,
             "Message value is supposed to be zero for ETH instance"
         );
-        payable(_recipient).call{value: denomination - _fee};
+        weth.mint(_recipient, denomination - _fee);
 
-        if (_fee > 0) {
-            payable(_relayer).call{value: _fee};
+        if(_fee > 0){
+            weth.mint(_relayer, _fee);
         }
     }
 
