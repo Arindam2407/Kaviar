@@ -15,12 +15,6 @@ Allowlists: only allowing certain whitelisted addresses to deposit in the respec
 
 ## Getting Started with Kaviar Website
 
-
-First of all, please specify the environment variables in the .env file to use the app:
-
-userOldSigner is the private key of the depositor,
-relayerSigner is the private key of the relayer/withdrawer
-
 Run the following code to get started:
 
 ```
@@ -32,6 +26,11 @@ npm run dev
 Sample subset tree address of Conflux eSpace Testnet: 0x9C9AA00704d458f1a46cdBbDA3abEb7964f248A2
 
 ## Getting Started with Kaviar CLI
+
+First of all, please specify the environment variables in the .env file to use the app:
+
+userOldSigner is the private key of the depositor,
+relayerSigner is the private key of the relayer/withdrawer
 
 Run the following code to get started:
 
