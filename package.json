@@ -4,7 +4,6 @@
   "description": "Regulatory-compliant Currency-Mixer enabled by Privacy Pools",
   "license": "MIT",
   "scripts": {
-    "compile": "hardhat compile && typechain --out-dir types --target ethers-v5 './artifacts/contracts/**/!(*.dbg).json'",
     "deploy_subset": "cargo run deploy_subset",
     "blacklist": "cargo run blacklist",
     "unblacklist": "cargo run unblacklist",
