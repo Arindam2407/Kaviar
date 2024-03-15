@@ -37,8 +37,6 @@ Run the following code to get started:
 npm install
 ```
 
-The command will compile the smart contracts
-
 ## Deposit
 
 When depositing funds, the depositor needs to specify which list/set they wish to be a part of through passing in as an argument the contract address of the subset merkle tree associated with the list. This allows Kaviar to maintain a global pool like traditional currency mixers yet allow for sub-pools desirable for regulatory-compliance.
