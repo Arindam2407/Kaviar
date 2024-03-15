@@ -12,14 +12,6 @@ pub struct ChainInfo {
 // supported chain names
 pub fn parse_chain(chain: &str) -> Result<ChainInfo, &'static str> {
     match chain {
-        "CONFLUX" => Ok(ChainInfo {
-            chain_enum_value: Chain::Goerli,
-            chain_env_var: String::from("CONFLUX_URL"),
-            explorer: String::from("https://evmtestnet.confluxscan.io/tx/"),
-            poseidon: String::from("0xE8eddE68F249fA99AD369EbD0053961518607F6a"),
-            verifier: String::from("0xfb3b532c1350269ad23c1f530daa868ce6b156c8"),
-            kaviar: String::from("0x21ed3af2d38d66b6b955d7108dcddf54317e5c6a"),
-        }),
         "BSC" => Ok(ChainInfo {
             chain_enum_value: Chain::BinanceSmartChainTestnet,
             chain_env_var: String::from("BSC_TESTNET_URL"),

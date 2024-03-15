@@ -51,7 +51,7 @@ After this, you will be prompted to
 
 Enter Chain :
 
-Currently supported chains are 'CONFLUX', 'BSC' and 'MANTLE' (Testnets),
+Currently supported chains are 'BSC' and 'MANTLE' (Testnets),
 
 Enter Subset Tree Address :
 
