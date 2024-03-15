@@ -1,0 +1,30 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Hasher",
+  "sourceName": "contracts/MerkleTree.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32[2]",
+          "name": "leftRight",
+          "type": "bytes32[2]"
+        }
+      ],
+      "name": "poseidon",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
